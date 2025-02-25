@@ -75,7 +75,7 @@ a {
     position:absolute;
     top: 32px;
     right: 32px;
-    font-size: 24px; 
+    font-size: 24px;    
 }
 
 @media screen and (max-width: 1040px) {
@@ -122,87 +122,104 @@ a {
         border-radius: none;
     }
 }
-.image_notice {
-    width: 100%; 
-    max-width: 1920px; 
-    height: auto; 
-    overflow: hidden; 
+
+label[for="Edit_memberinfo"] {
+    display: block; /* 블록 요소로 변경 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    width: 100%; /* 부모 컨테이너 기준 전체 너비 */
+    font-size: 40px; /* 글자 크기 조정 (선택 사항) */
+    font-weight: bold; /* 글자 굵기 조정 (선택 사항) */
+    margin-bottom: 5px; /* 아래 간격 추가 */
+    margin: 10px;
 }
-.image_notice img {
-    width: 100%; 
-    height: 350px; 
-    object-fit: cover; 
-    display: block;
-}
-.notice_container {
+
+.Edit_memberinfo-form-container {
     width: 90%;
-    margin-top: 0px;
-    margin-left: 50px; 
+    max-width: 400px;
+    margin: 50px auto;
     padding: 20px;
-    background: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    margin-bottom: 10px;
-}
-.notice_container h2 {
-    padding: 20px;
-    font-size: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.notice_table {
-    font-size: 25px;
-    width: 100%;
-    border-collapse: collapse;
-}
-.notice_table tr {
-    border-bottom: 1px solid #ddd;
-}
-
-.notice_table td {
-    padding: 12px;
-    text-align: left;
-}
-
-.notice_table td:first-child {
-    color: #9cb1ee;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.notice_table td:nthchild(3) {
-    text-align: right;
-    color: #666;
-}
-.notice_table td:nth-child(2),
-.notice_table td:nth-child(3) { 
-    font-size: 20px; 
-    color: #444; 
-}
-
-
-.pagination {
-    margin-top: 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
 }
 
-.page-btn {
-    padding: 8px 12px;
+/* 입력 필드 컨테이너 정렬 */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 왼쪽 정렬 */
+    width: 100%;
+    max-width: 350px; /* 입력 필드 크기 조정 */
+    margin-bottom: 15px; /* 입력 필드 간격 조정 */
+}
+
+/* 레이블 스타일 */
+.input-group label {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+/* 입력 필드 스타일 */
+.input-group input {
+    width: 100%;
+    padding: 1px;
     border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: pointer;
     border-radius: 5px;
-    font-size: 15px;
+    font-size: 12px;
+    height: 40px;
 }
 
-.page-btn:hover {
-    background-color: #ddd;
+/* 주소 입력 필드 & 버튼 가로 정렬 */
+.check_container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px; /* 버튼과 입력 필드 간격 조정 */
 }
 
-.active-page {
-    padding: 8px 12px;
-    border-radius: 5px;    background-color: #000;
-    color: #fff;
+/* 주소 입력 필드 크기 조정 */
+.check_container input {
+    flex: 1;
+    height: 42px;
+}
+
+/* 버튼 스타일 */
+button,
+.find_address {
+    height: 44px;
+    padding: 12px 16px;
+    font-size: 14px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;    
+}
+
+/* 버튼 호버 효과 */
+button:hover,
+.find_address:hover {
+    background: #ccc;
+}
+
+/* 제출 버튼 스타일 */
+.signup-form button[type="submit"] {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 10px;
+    height: 48px;
+    text-align: center;
+}
+
+/* 입력 안되는 항목 */
+#email, #userId, #phone, #name {
+    background-color: #cdcdcd; /* 회색 */
 }

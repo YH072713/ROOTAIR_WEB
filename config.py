@@ -3,7 +3,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': '1234',
-    'database': 'mydatabase',
+    'database': 'Flight_DB',
     'charset': 'utf8mb4',
     'use_unicode': True
 }

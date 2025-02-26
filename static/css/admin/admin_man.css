@@ -133,7 +133,6 @@ a {
     max-width: 1100px;
     text-align: center;
     height: 900px;
-    
 }
 
 .admin_man_container h2 {
@@ -177,25 +176,58 @@ input[type="text"] {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+/* ✅ 페이지네이션 스타일 수정 */
 .pagination {
     margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px; /* 버튼 간격 */
 }
 
 .page-btn {
     cursor: pointer;
-    padding: 5px 10px;
-    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
     background-color: #f9f9f9;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 40px; /* 버튼 크기 균일하게 */
+    text-align: center;
 }
 
 .page-btn:hover {
     background-color: #e0e0e0;
+    border-color: #999;
 }
 
+/* ✅ 현재 페이지 스타일 */
 .active-page {
     font-weight: bold;
-    color: #fff;
-    background-color: #444;
-    padding: 5px 10px;
+    color: white;
+    background-color: #555;
+    border: 1px solid #555;
+    padding: 10px 15px;
     border-radius: 5px;
+}
+
+/* ✅ Previous / Next 버튼 - 현재 페이지 스타일과 동일한 색상 */
+#prevPage, #nextPage {
+    font-weight: bold;
+    background-color: #555;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid #555;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    min-width: 80px; /* 버튼 크기 동일하게 */
+}
+
+/* ✅ 버튼 호버 효과 추가 */
+#prevPage:hover, #nextPage:hover {
+    background-color: #333;
+    border-color: #333;
 }

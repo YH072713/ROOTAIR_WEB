@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/member/member_login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/member/member_login.js') }}" defer></script>
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <a href="/">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="RootAir Logo">
+            </a>
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="#">예약</a></li>
+            <li><a href="#">공지사항</a></li>
+            <li><a href="#">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            <li class="navbar_signup"><a href="{{ url_for('member.sign_up') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login_page') }}">로그인</a></li>
+        </ul>
+        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18" alt="Toggle Button">
+    </nav>
+
+    <!-- 로그인 페이지 -->
+    <div class="login_page_wrapper">
+        <header id="LoginType" class="login_wrap"></header>
+        <div class="login-page">
+            <!-- 로그인 폼 -->
+            <div class="login-input">
+                <form method="post" action="{{ url_for('member.login') }}" id="login-form">
+                    <!-- 사용자 ID 입력 -->
+                    <div class="userID">
+                        <input type="text" id="user_id" name="user_id" placeholder="아이디" required />
+                    </div>
+
+                    <!-- 비밀번호 입력 -->
+                    <div class="password">
+                        <input type="password" id="password" name="password" placeholder="비밀번호" required />
+                    </div>
+
+                    <!-- 로그인 버튼 -->
+                    <div class="logininput">
+                        <button type="submit">로그인</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 비밀번호 찾기 및 회원가입 링크 -->
+            <div class="bottombox">
+                <a class="find-pw" href="#">비밀번호 찾기</a>
+                <a class="sign-on" href="{{ url_for('member.sign_up') }}">회원가입</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 파일 -->
+    <script src="{{ url_for('static', filename='js/member/member_login.js') }}"></script>
+</body>
+</html>

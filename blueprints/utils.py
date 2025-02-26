@@ -6,7 +6,7 @@ def get_db_connection():
         host='localhost',
         user='root',
         password='1234',
-        database='Flight_DB',
+        database='mydatabase',
         charset='utf8mb4',
         use_unicode=True,
         cursorclass=pymysql.cursors.DictCursor

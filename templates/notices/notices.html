@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공지사항</title>
+
+    <!-- Flask 방식으로 CSS 로드 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notices/notices.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+
+    <!-- Flask 방식으로 JS 로드 -->
+    <script src="{{ url_for('static', filename='js/notices/notices.js') }}" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <a href="{{ url_for('main.main') }}">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="로고">
+            </a>
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+        </ul>
+        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>
+    </nav>
+
+    <div class="image_notice">
+        <img src="{{ url_for('static', filename='images/notice.jpg') }}" alt="notice 이미지">
+    </div>
+
+    <div class="notice_container">
+        <h2>공지사항</h2>
+        <table class="notice_table">
+            <tbody id="notice_list">
+                {% for notice in notices %}
+                <tr>
+                    <td>📢 공지사항</td>
+                    <td><a href="{{ url_for('notices.notices_page', notice_id=notice.notice_id) }}" class="notice_link">{{ notice.title }}</a></td>
+                    <td>{{ notice.created_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <button id="prevPage" class="page-btn">← Previous</button>
+            <span id="pageNumbers"></span>
+            <button id="nextPage" class="page-btn">Next →</button>
+         </div>
+        <div class="submit_button">
+            <button onclick="gosubmit()" class="adsubmit_button" hidden>공지 등록</button>
+        </div>
+    </div>
+</body>
+</html>

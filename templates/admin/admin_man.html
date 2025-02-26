@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 목록</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_man.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> 
+    
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <a href="{{ url_for('main.main') }}">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}"/>
+            </a>
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+        </ul>
+        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>
+    </nav>
+</body>
+<body>
+    <div class="admin_man_container">
+        <h2>회원정보(관리자용)</h2>
+        <div class="admin_man_search">
+            <input type="text" id="" placeholder="회원검색" onkeyup="">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>전화번호</th>
+                    <th>Email</th>
+                    <th>삭제</th>
+                </tr>
+            </thead>
+            <tbody id="memberTable"></tbody>
+        </table>
+            
+        <div class="pagination">
+            <button id="prevPage" class="page-btn">← Previous</button>
+            <span id="pageNumbers"></span>
+            <button id="nextPage" class="page-btn">Next →</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/admin/admin_man.js') }}" defer></script>
+</body>
+</html>    
+

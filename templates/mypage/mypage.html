@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mypage/mypage.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> 
+    <script src="{{ url_for('static', filename='js/mypage/mypage.js') }}" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <a href="{{ url_for('main.main') }}">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}"/>
+            </a>
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+        </ul>
+        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>
+    </nav>
+</body>
+<body>
+    <section class="user-info">
+        <h2>나의 정보</h2>
+        <div class="info-box">
+            <div class="info-content">
+                <div class="profile">
+                    {% if user %}
+                        <h3>{{user.username}}</h3>
+                        <p><strong>PHONE</strong> | {{ user.phone_number | default("없음") }}</p>
+                        <p><strong>EMAIL</strong> | {{ user.email | default("없음") }}</p>
+                        <p><strong>ADDRESS</strong> | {{ user.address | default("없음") }} {{ user.add_detail | default("") }}</p>
+                    {% else %}
+                        <h3>사용자 정보 없음</h3>
+                    {% endif %}
+                </div>
+                <div class="circle-container">
+                    <div class="circle deep-blue">
+                        <p>총 자산</p>
+                        <h2>{{ "{:,}".format(user.mymoney | default(0)) }}<span class="unit">원</span></h2>
+                    </div>                    
+                    <div class="circle right-blue">
+                        <p>총 잔여 마일리지</p>
+                        <h2>{{ "{:,}".format(user.mileage | default(0)) }}</h2>
+                    </div>
+                    <div class="circle green">
+                        <p>예약된 여정</p>
+                        <h2>{{flight_cnt}}</h2>
+                    </div>
+                </div>        
+            </div>
+        </div>
+    </section>
+    <section class="ticket-info">
+        <h2>항공권 예약 정보</h2>
+        <div id="ticket-container"></div>
+        <div class="user-buttons">
+            <button class="edit-btn" onclick="location.href='/mypage/edit';">회원 정보 수정</button>
+            <button class="delete-btn" onclick="location.href='/mypage/cancel';">회원 탈퇴</button>            
+        </div>
+    </section>
+</body>
+</html>

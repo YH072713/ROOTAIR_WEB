@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 문의</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/qna.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <a href="{{ url_for('reservation.main') }}">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="로고">
+            </a>
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="{{ url_for('reservation.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            <li class="navbar_signup"><a href="{{ url_for('login.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('login.login') }}">로그인</a></li>
+        </ul>
+    </nav>
+
+    <div class="qna_container">
+        <h2>나의 문의사항</h2>
+        <table class="question-table">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>상태</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+            <tbody id="question-list">
+                <!-- ✅ JS가 데이터를 여기에 채워넣음 -->
+            </tbody>
+        </table>
+
+        <div class="pagination" id="pagination">
+            <!-- ✅ JS가 페이지네이션 버튼을 생성 -->
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/my.js') }}"></script>  
+</body>
+</html>

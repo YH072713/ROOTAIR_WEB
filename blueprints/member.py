@@ -3,13 +3,12 @@ from blueprints.utils import get_db_connection
 
 member_bp = Blueprint('member', __name__, url_prefix='/member')
 
-# 로그인 페이지
-@member_bp.route('/login')
+# 📌 
+@member_bp.route('/')
 def login():
-    return render_template('login.html')
+    return render_template('reservation.html')
 
-# 회원가입 페이지
-@member_bp.route('/signup')
+# 📌 
+@member_bp.route('/')
 def signup():
-    return render_template('signup.html')
-
+    return render_template('reservation.html')

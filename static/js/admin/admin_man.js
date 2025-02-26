@@ -23,6 +23,7 @@ async function fetchMembers() {
             throw new Error(`서버 응답 오류: ${response.status}`);
         }
         members = await response.json();
+        currentPage = 1; // 데이터를 가져올 때 첫 페이지로 초기화
         displayMembers();
         displayPagination();
     } catch (error) {
@@ -30,35 +31,38 @@ async function fetchMembers() {
     }
 }
 
-function displayMembers() {
+function displayMembers(filteredMembers = null) {
     const memberTable = document.getElementById("memberTable");
     memberTable.innerHTML = "";
 
+    const data = filteredMembers || members; // 검색된 데이터가 있으면 그걸 사용
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
-    const paginatedMembers = members.slice(start, end);
+    const paginatedMembers = data.slice(start, end);
 
     paginatedMembers.forEach(member => {
         const row = document.createElement("tr");
 
         row.innerHTML = `
             <td>${member.id}</td>
-                <td><input type="text" value="${member.user_id}" readonly></td>
-                <td><input type="text" value="${member.username}" readonly></td>
-                <td><input type="text" value="${member.phone_number}" readonly></td>
-                <td><input type="text" value="${member.email}" readonly></td>
-                <td><button class="delete-btn" onclick="deleteMember(${member.id})" readonly>삭제</button></td>
+            <td><input type="text" value="${member.user_id}" readonly></td>
+            <td><input type="text" value="${member.username}" readonly></td>
+            <td><input type="text" value="${member.phone_number}" readonly></td>
+            <td><input type="text" value="${member.email}" readonly></td>
+            <td><button class="delete-btn" onclick="deleteMember(${member.id})">삭제</button></td>
         `;
 
         memberTable.appendChild(row);
     });
+
+    displayPagination(filteredMembers ? filteredMembers.length : members.length); // 검색 결과 페이지네이션 업데이트
 }
 
-function displayPagination() {
+function displayPagination(totalItems = members.length) {
     const pageNumbers = document.getElementById("pageNumbers");
     pageNumbers.innerHTML = "";
 
-    const totalPages = Math.ceil(members.length / itemsPerPage);
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     for (let i = 1; i <= totalPages; i++) {
         const pageSpan = document.createElement("span");
@@ -70,6 +74,7 @@ function displayPagination() {
         pageSpan.addEventListener("click", () => {
             currentPage = i;
             displayMembers();
+            displayPagination(totalItems);  // 페이지네이션 다시 갱신
         });
         pageNumbers.appendChild(pageSpan);
     }
@@ -104,6 +109,7 @@ document.getElementById("prevPage").addEventListener("click", () => {
     if (currentPage > 1) {
         currentPage--;
         displayMembers();
+        displayPagination();  // 페이지네이션 업데이트
     }
 });
 
@@ -112,16 +118,21 @@ document.getElementById("nextPage").addEventListener("click", () => {
     if (currentPage < totalPages) {
         currentPage++;
         displayMembers();
+        displayPagination();  // 페이지네이션 업데이트
     }
 });
 
-// 검색 기능
+// 🔎 검색 기능 (검색 시 필터링 후 첫 페이지부터 다시 시작)
 function searchMembers() {
     const input = document.getElementById("searchInput").value.toLowerCase();
-    const rows = document.querySelectorAll("#memberTable tr");
+    const filteredMembers = members.filter(member => 
+        member.user_id.toLowerCase().includes(input) ||
+        member.username.toLowerCase().includes(input) ||
+        member.phone_number.toLowerCase().includes(input) ||
+        member.email.toLowerCase().includes(input)
+    );
 
-    rows.forEach(row => {
-        const rowText = row.innerText.toLowerCase();
-        row.style.display = rowText.includes(input) ? "" : "none";
-    });
+    currentPage = 1; // 검색 시 첫 페이지로 이동
+    displayMembers(filteredMembers);
+    displayPagination(filteredMembers.length);
 }

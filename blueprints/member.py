@@ -120,6 +120,9 @@ def verify():
 ###########회원가입##############
 @member_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
+    if current_user.is_authenticated:  # Flask-Login을 사용하는 경우, 로그인사용자의 경우 마이페이지로 보낸다다
+        return redirect(url_for('mypage.mypage'))
+    
     if request.method == 'GET':
         verified_email = session.get('verified_email')
         if not verified_email:
@@ -186,8 +189,8 @@ def check_id():
 ######################로그인#########################
 @member_bp.route('/login', methods=['GET'])
 def login_page():
-    if current_user.is_authenticated:  # Flask-Login을 사용하는 경우
-        return redirect(url_for('main.main'))
+    if current_user.is_authenticated:  # Flask-Login을 사용하는 경우, 로그인사용자의 경우 마이페이지로 보낸다다
+        return redirect(url_for('mypage.mypage'))
     return render_template('member/member_login.html')
 
 @member_bp.route('/login', methods=['POST'])

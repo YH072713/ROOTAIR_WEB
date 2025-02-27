@@ -338,45 +338,7 @@ def generate_otp():
     """6자리 인증 코드 생성"""
     return ''.join(random.choices(string.digits, k=6))
 
-# 이메일 전송 함수
-def send_email(email, otp):
 
-#이메일 전송 로직 (생략 가능)
-    msg = Message('이메일 인증 코드', sender="tjstjdghks@gmail.com", recipients=[email])
-    msg.body = f'귀하의 인증 코드는 {otp}입니다.'
-    current_app.extensions['mail'].send(msg)        
-
-    send_email_smtp(email, msg, msg.body)  # SMTP를 이용한 실제 이메일 전송 함수 호출
-
-def send_email_smtp(to_email, subject, message):
-    smtp_server = "smtp.gmail.com"  # Gmail SMTP 서버
-    smtp_port = 587  # TLS 포트
-    sender_email = "tjstjdghks@gmail.com"  # 발신자 이메일
-    sender_password = "nmdq qjbr oxsb opdg"  # 앱 비밀번호 (보안 중요!)
-
-    msg = MIMEText(message, _charset="utf-8")
-
-    msg["Subject"] = subject
-    msg["From"] = sender_email
-    msg["To"] = to_email
-
-    try:
-        print("[DEBUG] Initializing SMTP server connection...")
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        print("[DEBUG] Starting TLS...")
-        server.starttls()
-        print("[DEBUG] Logging in...")
-        server.login(sender_email, sender_password)
-        print("[DEBUG] Sending email...")
-        server.sendmail(sender_email, to_email, msg.as_string())
-        server.quit()
-        print(f"✅ [이메일 전송 성공] {to_email} 로 인증코드 전송 완료!")
-    except smtplib.SMTPAuthenticationError as auth_error:
-        print(f"❌ [SMTP 인증 오류] {auth_error}")
-    except smtplib.SMTPException as smtp_error:
-        print(f"❌ [SMTP 오류] {smtp_error}")
-    except Exception as e:
-        print(f"❌ [알 수 없는 오류] {e}")
 
 # ✅ HTML 페이지 렌더링
 @member_bp.route('/forgot_password')
@@ -422,7 +384,9 @@ def request_reset_code():
     print("세션 저장됨:", session.get("email"))
 
     # 3️⃣ 실제 이메일 발송 로직 (이메일 서버 필요)
-    send_email(email,otp)
+    msg = Message('이메일 인증 코드', sender=current_app.config['MAIL_USERNAME'], recipients=[email])
+    msg.body = f'귀하의 인증 코드는 {otp}입니다.'
+    current_app.extensions['mail'].send(msg)
 
     return jsonify({"success": True, "message": "인증 코드가 이메일로 전송되었습니다."})
 

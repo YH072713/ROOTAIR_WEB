@@ -125,10 +125,9 @@ def signup():
         return redirect(url_for('mypage.mypage'))  # 마이페이지로 리디렉트
 
     if request.method == 'GET':
-        verified_email = session.get('verified_email')
-        if not verified_email:
-            return redirect(url_for('member.main'))  # 이메일 인증 페이지로 리다이렉션
-        return render_template('member/member_signup.html', email=verified_email)
+        if not session.get('email_verified'):
+            return redirect(url_for('member.email_confirm_page'))
+        return render_template('member/signup.html')
     
     if request.method == 'POST':
         data = request.json
@@ -191,6 +190,7 @@ def check_id():
 @member_bp.route('/login', methods=['GET'])
 def login_page():
 
+
     if current_user.is_authenticated:  # 이미 로그인된 경우
         return redirect(url_for('mypage.mypage'))  # 마이페이지로 리디렉트
 
@@ -208,10 +208,13 @@ def login():
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            cursor.execute("SELECT id, user_id, password FROM users WHERE user_id = %s", (user_id,))
+            cursor.execute("SELECT id, user_id, password, isadmin FROM users WHERE user_id = %s", (user_id,))
             user_data = cursor.fetchone()
 
             if user_data and check_password_hash(user_data['password'], password):
+                if user_data['isadmin'] == 1:
+                    return jsonify({"error": "Administrators cannot log in through this interface"}), 403
+                
                 user = User(id=user_data['id'], user_id=user_data['user_id'])
                 login_user(user, remember=False)
                 
@@ -237,114 +240,6 @@ def logout():
 
     return response  # 로그아웃 후 세션이 유지되지 않도록 처리
 
-#####################회원정보 수정#########################################
-# @member_bp.route('/edit_info', methods=['GET', 'POST'])
-# @login_required
-# def edit_info():
-#     if 'user_id' not in session:
-#         return jsonify({"error": "User not logged in"}), 401
-    
-#     current_user_id = session['user_id']
-    
-#     if request.method == 'GET':
-#         try:
-#             connection = get_db_connection()
-#             with connection.cursor() as cursor:
-#                 cursor.execute("SELECT * FROM users WHERE id = %s", (current_user_id,))
-#                 user = cursor.fetchone()
-            
-#             if not user:
-#                 return jsonify({"error": "User not found"}), 404
-            
-#             return render_template('member/edit_info.html', user=user)
-#         finally:
-#             connection.close()
-    
-#     if request.method == 'POST':
-#         data = request.json
-#         updates = {}
-#         if 'new_password' in data and data['new_password']:
-#             updates['password'] = generate_password_hash(data['new_password'])
-#         if 'address' in data:
-#             updates['address'] = data['address']
-#         if 'postal_code' in data:
-#             updates['postal_code'] = data['postal_code']
-#         if 'add_detail' in data:
-#             updates['add_detail'] = data['add_detail']
-
-#         if updates:
-#             try:
-#                 connection = get_db_connection()
-#                 with connection.cursor() as cursor:
-#                     update_query = "UPDATE users SET " + ", ".join([f"{key} = %s" for key in updates.keys()]) + " WHERE id = %s"
-#                     cursor.execute(update_query, list(updates.values()) + [current_user_id])
-#                 connection.commit()
-#                 return jsonify({"success": True, "message": "프로필이 성공적으로 업데이트되었습니다."})
-#             except Exception as e:
-#                 connection.rollback()
-#                 print(f"Profile update error: {str(e)}")
-#                 return jsonify({"success": False, "message": f"프로필 업데이트 중 오류가 발생했습니다: {str(e)}"}), 500
-#             finally:
-#                 connection.close()
-#         else:
-#             return jsonify({"success": True, "message": "변경된 내용이 없습니다."})
-
-#     return jsonify({"error": "Invalid request method"}), 405
-
-# ################회원 탈퇴##########################
-# @member_bp.route('/user_delete', methods=['GET', 'POST'])
-# @login_required
-# def user_delete():
-#     if 'user_id' not in session:
-#         return redirect(url_for('member.login'))  # 로그인 페이지로 리다이렉트
-
-#     current_user_id = session['user_id']
-
-#     if request.method == 'GET':
-#         try:
-#             connection = get_db_connection()
-#             with connection.cursor() as cursor:
-#                 cursor.execute("SELECT username FROM users WHERE id = %s", (current_user_id,))
-#                 user = cursor.fetchone()
-#             if user:
-#                 return render_template('member/user_delete.html', username=user['username'])
-#             else:
-#                 return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
-#         finally:
-#             connection.close()
-
-#     if request.method == 'POST':
-#         password = request.json.get('password')
-
-#         if not password:
-#             return jsonify({"error": "비밀번호를 입력해주세요."}), 400
-
-#         try:
-#             connection = get_db_connection()
-#             with connection.cursor() as cursor:
-#                 cursor.execute("SELECT * FROM users WHERE id = %s", (current_user_id,))
-#                 user = cursor.fetchone()
-
-#             if not user:
-#                 return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
-
-#             if check_password_hash(user['password'], password):
-#                 with connection.cursor() as cursor:
-#                     cursor.execute("DELETE FROM users WHERE id = %s", (current_user_id,))
-#                 connection.commit()
-#                 session.clear()  # 세션 정보 삭제
-#                 return jsonify({"message": "회원 탈퇴가 완료되었습니다.", "success": True}), 200
-#             else:
-#                 return jsonify({"error": "비밀번호가 일치하지 않습니다."}), 400
-
-#         except Exception as e:
-#             connection.rollback()
-#             print(f"Error during user deletion: {str(e)}")
-#             return jsonify({"error": "회원 탈퇴 중 오류가 발생했습니다."}), 500
-#         finally:
-#             connection.close()
-
-#     return jsonify({"error": "Invalid request method"}), 405
 
 ###########################비밀번호 찾기##########################################
 

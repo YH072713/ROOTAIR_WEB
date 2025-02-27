@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>문의사항</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/qna.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/qna/qna.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> 
     
@@ -13,24 +12,23 @@
 <body>
     <nav class="navbar">
         <div class="navbar_logo">
-            <a href="{{ url_for('reservation.main') }}">
+            <a href="{{ url_for('main.main') }}">
                 <img src="{{ url_for('static', filename='images/rootair.jpg') }}"/>
             </a>
         </div>
         <ul class="navbar_menu">
-            <li><a href="{{ url_for('reservation.main') }}">예약</a></li>
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
             <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
             <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            <li class="navbar_signup"><a href="{{ url_for('login.signup') }}">회원가입</a></li>
-            <li class="navbar_login"><a href="{{ url_for('login.login') }}">로그인</a></li>
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
         </ul>
         <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>
     </nav>
 </body>
-        </div>
-    </header>
+
 <!-- 배경 이미지 -->
 <div class="image_qna">
     <img src="{{ url_for('static', filename='images/qna.jpg') }}">
@@ -54,7 +52,6 @@
                     <th>번호</th>
                     <th>제목</th>
                     <th>작성자</th>
-                    <th>상태</th>
                     <th>작성일</th>
                 </tr>
             </thead>
@@ -73,7 +70,6 @@
                 <tr>
                     <th>번호</th>
                     <th>제목</th>
-                    <th>상태</th>
                     <th>작성일</th>
                 </tr>
             </thead>
@@ -85,10 +81,10 @@
     </div>
 
     <div class="qna_button_container">
-        <button id="qnawrite" onclick="location.href='{{ url_for('qna.qna_create') }}'">문의 등록</button>
+        <button id="qnawrite" onclick="location.href='{{ url_for('qna.qna_create_page') }}'">문의 등록</button>
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/qna.js') }}"></script> 
+<script src="{{ url_for('static', filename='js/qna/qna.js') }}"></script> 
 </body>
 </html>

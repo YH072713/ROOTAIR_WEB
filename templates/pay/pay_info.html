@@ -59,6 +59,10 @@
     <!-- 결제 정보 -->
     <div class="info-box">
         총 결제 금액: <span id="display_total_price">{{ total_price }}</span> 원
+        <p>DEBUG: 출발 시간 = {{ departure_time }}</p> <!-- 🔥 실제 값 확인 -->
+<input type="hidden" id="departure_time" name="departure_time" value="{{ departure_time }}">
+<input type="hidden" id="arrival_time" name="arrival_time" value="{{ arrival_time }}">
+
     </div>
 
     <!-- 결제 동의 체크박스 -->
@@ -69,63 +73,87 @@
 
     <!-- 결제 정보 전송 폼 -->
     <form id="paymentInfoForm" action="/pay/process_payment" method="POST">
-        <input type="hidden" name="username" value="{{ passenger_username }}">
-        <input type="hidden" name="eng_name" value="{{ passenger_eng_name }}">
-        <input type="hidden" name="airplan_name" value="{{ airplan_name }}">
-        <input type="hidden" name="seat_class" value="{{ seat_class }}">
-        <input type="hidden" name="passenger_count" value="{{ passenger_count }}">
-        <input type="hidden" name="total_price" value="{{ total_price }}">
-        <input type="hidden" name="email" value="{{ email }}">
-        <input type="hidden" name="mileage_used" id="mileage_used_field" value="{{ mileage_used }}">
+<!-- 🔥 더 이상 필요 없는 `Flights` 데이터 제거 -->
+        <input type="hidden" id="flight_id" name="flight_id" value="{{ flight_id }}">
+        <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
+        <input type="hidden" id="total_price" name="total_price" value="{{ total_price }}">
+        <input type="hidden" id="passenger_count" name="passenger_count" value="{{ passenger_count }}">
+        <input type="hidden" id="email" name="email" value="{{ email }}">
+        <input type="hidden" id="eng_name" name="eng_name" value="{{ eng_name }}">
+        <input type="hidden" id="final_mileage" name="final_mileage" value="{{ final_mileage }}">
+        <input type="hidden" id="remaining_balance" name="remaining_balance" value="{{ remaining_balance }}">
+
+
+
+
 
         <button type="button" onclick="submitPayment()">결제 진행</button>
     </form>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // GET 파라미터에서 데이터 가져오기
-            const urlParams = new URLSearchParams(window.location.search);
-    
-            document.getElementById("display_total_price").textContent = urlParams.get("total_price") + " 원";
-            document.getElementById("paymentInfoForm").elements["username"].value = urlParams.get("username");
-            document.getElementById("paymentInfoForm").elements["eng_name"].value = urlParams.get("eng_name");
-            document.getElementById("paymentInfoForm").elements["airplan_name"].value = urlParams.get("airplan_name");
-            document.getElementById("paymentInfoForm").elements["seat_class"].value = urlParams.get("seat_class");
-            document.getElementById("paymentInfoForm").elements["passenger_count"].value = urlParams.get("passenger_count");
-            document.getElementById("paymentInfoForm").elements["total_price"].value = urlParams.get("total_price");
-            document.getElementById("paymentInfoForm").elements["email"].value = urlParams.get("email");
-            document.getElementById("paymentInfoForm").elements["mileage_used"].value = urlParams.get("mileage_used");
-    
-            console.log("DEBUG: GET 파라미터로 전달된 데이터", Object.fromEntries(urlParams.entries()));
-        });
-    
-        function submitPayment() {
-            let consentChecked = document.getElementById("consent").checked;
-            if (!consentChecked) {
-                alert("결제 정보를 제공에 동의해야 합니다.");
-                return;
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DEBUG: 결제 정보 페이지 로드 완료");
+
+    // ✅ GET 파라미터에서 데이터 가져오기
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log("DEBUG: GET 파라미터 =", Object.fromEntries(urlParams.entries())); // 🔥 GET 데이터 확인
+
+    // ✅ HTML에 데이터 표시
+    document.getElementById("display_total_price").textContent = urlParams.get("total_price") || "0";
+
+    // ✅ 폼 데이터 자동 채움 (오타 수정 및 기본값 설정)
+    let form = document.getElementById("paymentInfoForm");
+
+    form.elements["username"].value = urlParams.get("username") || "Unknown User";
+    form.elements["eng_name"].value = urlParams.get("eng_name") || "N/A";  // ✅ `eng_name` 포함
+    form.elements["airplane_name"].value = urlParams.get("airplane_name") || "Unknown Flight";
+    form.elements["seat_class"].value = urlParams.get("seat_class") || "Economy";
+    form.elements["passenger_count"].value = urlParams.get("passenger_count") || "1";
+    form.elements["total_price"].value = urlParams.get("total_price") || "0";
+    form.elements["email"].value = urlParams.get("email") || "example@email.com";
+    form.elements["mileage_used"].value = urlParams.get("mileage_used") || "0";
+});
+
+function submitPayment() {
+    let consentChecked = document.getElementById("consent").checked;
+    if (!consentChecked) {
+        alert("결제 정보를 제공에 동의해야 합니다.");
+        return;
+    }
+
+    let formData = new FormData(document.getElementById("paymentInfoForm"));
+
+    // ✅ `eng_name` 값이 폼에 포함되는지 확인
+    console.log("DEBUG: 전송할 formData 데이터:");
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]} = ${pair[1]}`);
+    }
+
+    fetch("/pay/process_payment", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("DEBUG: 서버 응답 데이터 =", data);
+        if (data.redirect_url) {
+            // ✅ 부모 창이 존재하면 부모 창으로 리디렉트 메시지 전송
+            if (window.opener) {
+                window.opener.postMessage({ redirect_url: data.redirect_url }, "*");
             }
-    
-            let formData = new FormData(document.getElementById("paymentInfoForm"));
-    
-            fetch("/process_payment", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.redirect_url) {
-                    window.location.href = data.redirect_url; // 결제 완료 후 리디렉트
-                } else {
-                    alert("결제 처리 중 오류가 발생했습니다.");
-                }
-            })
-            .catch(error => {
-                console.error("ERROR: ", error);
-                alert("결제 처리 중 오류가 발생했습니다.");
-            });
+            window.close();  // ✅ 자식 창 닫기
+        } else {
+            alert("결제 실패: " + data.error);
         }
+    })
+    .catch(error => {
+        console.error("ERROR: 결제 요청 실패", error);
+        alert("결제 요청 중 오류가 발생했습니다.");
+    });
+}
+
     </script>
+    
     
 </body>
 </html>

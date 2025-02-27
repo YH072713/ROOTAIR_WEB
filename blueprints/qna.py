@@ -26,7 +26,7 @@ def qna_api():
 
     # 문의사항 목록 조회
     cursor.execute("""
-        SELECT inquiry_id, title, userID, created_at
+        SELECT inquiry_id, title, user_id, created_at
         FROM inquiries
         ORDER BY created_at DESC
         LIMIT %s OFFSET %s
@@ -67,11 +67,11 @@ def my_inquiries_api():
     page = request.args.get('page', 1, type=int)
     offset = (page - 1) * per_page
 
-    # ✅ 현재는 모든 데이터를 가져옴 (나중에 로그인 기능이 추가되면 `WHERE userID = %s` 조건 활성화)
+    # ✅ 현재는 모든 데이터를 가져옴 (나중에 로그인 기능이 추가되면 `WHERE user_id = %s` 조건 활성화)
     cursor.execute('''
         SELECT inquiry_id, title, created_at
         FROM inquiries
-        -- WHERE userID = %s  ✅ 로그인한 사용자의 ID로 필터링 (현재 주석 처리)
+        -- WHERE user_id = %s  ✅ 로그인한 사용자의 ID로 필터링 (현재 주석 처리)
         ORDER BY created_at DESC
         LIMIT %s OFFSET %s
     ''', (per_page, offset))
@@ -101,7 +101,7 @@ def qna_detail_page(qna_id):
 
     # ✅ 올바른 컬럼명으로 수정하여 데이터 조회
     cursor.execute('''
-        SELECT inquiry_id, title, content, userID, comment, created_at, file
+        SELECT inquiry_id, title, content, user_id, comment, created_at, file
         FROM inquiries
         WHERE inquiry_id = %s
     ''', (qna_id,))
@@ -126,7 +126,7 @@ def qna_detail_api(qna_id):
     cursor = conn.cursor()
 
     cursor.execute('''
-        SELECT inquiry_id, title, content, userID, comment, created_at,file
+        SELECT inquiry_id, title, content, user_id, comment, created_at,file
         FROM inquiries
         WHERE inquiry_id = %s
     ''', (qna_id,))
@@ -150,7 +150,7 @@ def qna_detail_api(qna_id):
         'inquiry_id': inquiry['inquiry_id'],
         'title': inquiry['title'],
         'content': inquiry['content'],
-        'userID': inquiry['userID'],
+        'user_id': inquiry['user_id'],
         'comment': inquiry['comment'],
         'created_at': inquiry['created_at'],
         'file_url': file_url  # ✅ 파일 다운로드 URL 추가
@@ -191,7 +191,7 @@ def qna_create_api():
 
     # ✅ DB에 저장
     cursor.execute('''
-        INSERT INTO inquiries (userID, title, content, file, is_secret, created_at)
+        INSERT INTO inquiries (user_id, title, content, file, is_secret, created_at)
         VALUES (%s, %s, %s, %s, %s, 'Pending', NOW())
     ''', (user_id, title, content, file_url, is_private))
 

@@ -40,14 +40,14 @@
                 </p>
             </div>
             <p class="qna_info">
-                작성자: {{ inquiry.userID }} | 작성일: {{ inquiry.created_at.strftime('%Y-%m-%d') }} 
+                작성자: {{ inquiry.user_id }} | 작성일: {{ inquiry.created_at.strftime('%Y-%m-%d') }} 
                 {% if inquiry.file %}
-                     <a href="{{ url_for('qna.download_file', filename=inquiry.file.split('/')[-1]) }}" download>
-                         <img src="{{url_for('static',filename='images/file.png')}}" width="20" height="15"> 
-                     </a>
-                 {%else%}
-                     <p>첨부파일 없음</p>
-                 {%endif%}
+                    <a href="{{ url_for('qna.download_file', filename=inquiry.file.split('/')[-1]) }}" download>
+                        <img src="{{url_for('static',filename='images/file.png')}}" width="20" height="15"> 
+                    </a>
+                {%else%}
+                    <p>첨부파일 없음</p>
+                {%endif%}
             </p>
             <hr>
             <p>{{ inquiry.content }}</p>
@@ -56,7 +56,7 @@
 
         <div class="admin_reply">
             <h4>관리자 답변</h4>
-            
+            {{ inquiry.comment }}
             {% if isAdmin %}
                 <div id="admin_reply_container">
                     <textarea id="admin_reply_input" placeholder="답변을 입력하세요"></textarea>
@@ -66,9 +66,9 @@
 
         <div class="btn_container">
             <button id="answerBtn" class="btn answer-btn" hidden>답변 등록</button>
-            <button id="editBtn" class="btn edit-btn" onclick="location.href='{{ url_for('qna.qna_edit_page',qna_id=qna_id) }}'">수정</button>
+            <button id="editBtn" class="btn edit-btn" onclick="location.href='{{ url_for('qna.qna_edit_page', qna_id=qna_id) }}'">수정</button>
             <button id="deleteBtn" class="btn delete-btn" data-qna-id="{{ inquiry.inquiry_id }}">삭제</button>
-            <button id="backBtn" class="btn back-btn" onclick="location.href='{{ url_for('qna.qna_page') }}'">목록보기</button>
+            <button id="backBtn" class="btn back-btn" onclick="location.href='{{ url_for('qna.qna_page')}}'">목록보기</button>
         </div>
     </div>
 </body>

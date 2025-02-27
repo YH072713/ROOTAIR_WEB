@@ -9,18 +9,21 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 @admin_bp.route('/', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        userID = request.form.get('userID')
+        user_id = request.form.get('user_id')
         password = request.form.get('password')
+
+        print(user_id)
+        print(password)
         
-        current_app.logger.debug("로그인 시도: userID=%s", userID)
+        current_app.logger.debug("로그인 시도: user_id=%s", user_id)
         
         # Users 테이블에서 관리자 계정 조회
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        query = f"SELECT * FROM Users WHERE user_id = '{userID}' AND password = '{password}' AND isadmin = 'Y';"
+        query = "SELECT * FROM users WHERE user_id = %s AND password = %s AND isadmin = %s"
         current_app.logger.debug("실행할 쿼리: %s", query)
-        cursor.execute(query)
+        cursor.execute(query, (user_id, password, 1))
         user = cursor.fetchone()
         current_app.logger.debug("쿼리 결과: %s", user)
         
@@ -29,12 +32,12 @@ def admin_login():
         
         if user:
             session['admin'] = True # 관리자 세션 설정
-            session['user_id'] = userID  # 로그인한 사용자의 아이디를 세션에 저장
-            current_app.logger.info("로그인 성공: user_id=%s", userID)
+            session['user_id'] = user_id  # 로그인한 사용자의 아이디를 세션에 저장
+            current_app.logger.info("로그인 성공: user_id=%s", user_id)
             flash('로그인 성공하였습니다.', 'success')
             return redirect(url_for('admin.admin_management')) # 로그인 후 회원정보 페이지로 이동
         else:
-            current_app.logger.error("회원 정보를 찾을 수 없습니다. user_id: %s", userID)
+            current_app.logger.error("회원 정보를 찾을 수 없습니다. user_id: %s", user_id)
             flash('아이디 또는 비밀번호가 올바르지 않습니다.', 'danger')
             return render_template('admin/admin.html')
     return render_template('admin/admin.html')

@@ -46,7 +46,7 @@
                 <div class="circle-container">
                     <div class="circle deep-blue">
                         <p>총 자산</p>
-                        <h2>{{ "{:,}".format(user.mymoney | default(0)) }}<span class="unit">원</span></h2>
+                        <h2>{{ "{:,}".format(user.balance | default(0)) }}<span class="unit">원</span></h2>
                     </div>                    
                     <div class="circle right-blue">
                         <p>총 잔여 마일리지</p>

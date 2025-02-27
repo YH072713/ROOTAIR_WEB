@@ -71,7 +71,7 @@ function signUp(event) {
     .then(data => {
         if (data.message === "Sign up successful") {
             alert("회원가입이 완료되었습니다.");
-            window.location.href = "/login";
+            window.location.href = "/member/login";
         } else {
             alert(data.error || "회원가입 중 오류가 발생했습니다.");
         }

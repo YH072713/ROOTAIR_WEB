@@ -1,29 +1,28 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>문의 수정</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/qna/qna_edit.css') }}">
+    <title>qna_register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/qna_edit.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
-    <script src="qna_edit.js" defer></script>
+    <script src="qna_create.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar_logo">
-            <a href="{{ url_for('main.main') }}">
+            <a href="{{ url_for('reservation.main') }}">
                 <img src="{{ url_for('static', filename='images/rootair.jpg') }}"/>
             </a>
         </div>
         <ul class="navbar_menu">
-            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('reservation.main') }}">예약</a></li>
             <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
             <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
-            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+            <li class="navbar_signup"><a href="{{ url_for('login.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('login.login') }}">로그인</a></li>
         </ul>
         <img class="navbar_togglebtn" src="{{url_for('static',filename='images/topbar.jpg')}}" width="24" height="18"/>
     </nav>
@@ -79,7 +78,8 @@
             </div>
         </form>
     </div>
-    <script src="{{ url_for('static', filename='js/qna/qna_edit.js') }}"></script>
+</div>
+    <script src="{{ url_for('static', filename='js/qna_create.js') }}"></script>
 </body>
 <script>
     document.getElementById("fileUploadBtn").addEventListener("click", function() {
@@ -127,4 +127,6 @@
 
     addRemoveEvent(); // 기존 파일이 있을 경우 삭제 버튼 이벤트 추가
 </script>
+
 </html>
+

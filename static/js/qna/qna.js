@@ -51,7 +51,6 @@ function displayInquiryList(inquiries) {
                 <td>${item.inquiry_id}</td>
                 <td><a href="/qna/${item.inquiry_id}">${item.title}</a></td>
                 <td>${item.userID}</td>
-                <td>${item.status}</td>
                 <td>${item.created_at}</td>
             </tr>
         `;

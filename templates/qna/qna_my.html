@@ -20,8 +20,13 @@
             <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            <li class="navbar_signup"><a href="{{ url_for('login.signup') }}">회원가입</a></li>
-            <li class="navbar_login"><a href="{{ url_for('login.login') }}">로그인</a></li>
+            {% if current_user.id %}
+                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
+                <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
+            {% else %}
+                <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+                <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+            {% endif %}
         </ul>
     </nav>
 

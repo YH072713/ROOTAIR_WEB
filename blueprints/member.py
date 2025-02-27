@@ -106,7 +106,7 @@ def verify():
                 return jsonify({
                     "message": "Verification successful",
                     "email": email,
-                    "redirect_url": url_for('member.sign_up')
+                    "redirect_url": url_for('member.signup')
                 }), 200
 
         return jsonify({"error": "Invalid OTP"}), 400
@@ -119,7 +119,7 @@ def verify():
 
 ###########회원가입##############
 @member_bp.route('/signup', methods=['GET', 'POST'])
-def sign_up():
+def signup():
     if request.method == 'GET':
         verified_email = session.get('verified_email')
         if not verified_email:

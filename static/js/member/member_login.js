@@ -28,10 +28,10 @@ document.getElementById("login-form").addEventListener("submit", function (event
             return response.json();
         })
         .then((data) => {
-            if (data.message === "Login successful") {  // 여기를 수정했습니다
+            if (data.message === "Login successful") {  
                 alert("로그인 성공!");
                 // 로그인 성공 후 메인 페이지로 리다이렉트
-                window.location.href = "/";
+                window.location.href = "/main";
             } else {
                 alert(data.error || "로그인 실패");
             }

@@ -59,7 +59,7 @@ def load_user(user_id):
     return None
 
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

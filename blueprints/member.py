@@ -186,6 +186,8 @@ def check_id():
 ######################로그인#########################
 @member_bp.route('/login', methods=['GET'])
 def login_page():
+    if current_user.is_authenticated:  # Flask-Login을 사용하는 경우
+        return redirect(url_for('main.main'))
     return render_template('member/member_login.html')
 
 @member_bp.route('/login', methods=['POST'])

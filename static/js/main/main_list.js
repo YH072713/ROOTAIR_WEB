@@ -1,6 +1,8 @@
 // 현재 선택된 항공편 번호
 let currentFlight = 1;
 
+
+
 // 항공편 제목 변경하는 함수
 function updateFlightTitle() {
     document.getElementById("flightTitle").textContent = `FLIGHT_0${currentFlight}`;
@@ -10,7 +12,7 @@ function updateFlightTitle() {
 const flightList = document.querySelector(".flight-list");
 
 // 기존 flights 변수를 서버에서 전달받은 데이터로 대체
-function renderflights() {
+function renderFlights() {
     flightList.innerHTML = ""; // 기존 목록 초기화
 
     flights.forEach((flight, index) => {
@@ -44,7 +46,7 @@ document.querySelector(".arrow-btn.right").addEventListener("click", () => {
         currentFlight = 1; // 다시 FLIGHT_01로 되돌아감
     }
     updateFlightTitle();
-    renderflights();
+    renderFlights();
 });
 
 document.querySelector(".arrow-btn.left").addEventListener("click", () => {
@@ -54,13 +56,13 @@ document.querySelector(".arrow-btn.left").addEventListener("click", () => {
         currentFlight = 5; // 마지막 FLIGHT로 되돌아감
     }
     updateFlightTitle();
-    renderflights();
+    renderFlights();
 });
 
 // 페이지 로드 시 항공권 목록 표시
 document.addEventListener("DOMContentLoaded", () => {
     updateFlightTitle();
-    renderflights();
+    renderFlights();
 });
 
 document.querySelector(".submit-btn").addEventListener("click", function () {

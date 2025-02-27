@@ -1,3 +1,5 @@
+// main.js
+
 document.addEventListener('DOMContentLoaded', () => {
     // ✅ 공항 데이터 배열
 const airports = [
@@ -140,6 +142,9 @@ addReservationButton.addEventListener('click', () => {
         alert('최대 5개의 예약만 추가할 수 있습니다.');
     }
 });
+
+
+
 
 
 function formatDateToISO(dateString) {
@@ -397,3 +402,5 @@ toggleModal(arrivalModal, false);
 // ✅ 모달 토글 함수
 const toggleModal = (modal, show) => modal.classList[show ? 'add' : 'remove']('show');
 });
+
+

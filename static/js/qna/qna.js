@@ -50,7 +50,7 @@ function displayInquiryList(inquiries) {
             <tr onclick="viewDetail(${item.inquiry_id})">
                 <td>${item.inquiry_id}</td>
                 <td><a href="/qna/${item.inquiry_id}">${item.title}</a></td>
-                <td>${item.userID}</td>
+                <td>${item.user_id}</td>
                 <td>${item.created_at}</td>
             </tr>
         `;

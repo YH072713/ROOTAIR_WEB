@@ -24,7 +24,7 @@ async function generateTickets() {
                 <div class="ticket-header">
                     <div class="header-info">
                         <img src="/static/images/plane.png">
-                        <span class="title">No. ${ticket.reservation_code}</span>
+                        <span class="title">No. ${ticket.booking_id}</span>
                     </div>
                     <button class="details-btn">상세 보기</button>
                 </div>
@@ -63,7 +63,7 @@ async function generateTickets() {
                         </div>
                         <div class="seat-body">
                             <div class="class-label">Cabin Class & Travelers</div>
-                            <div class="class-value">${ticket.age}, ${ticket.cabin_class}</div>
+                            <div class="class-value">${ticket.age}, ${ticket.seat_class}</div>
                         </div>
                     </div>
                 </div>

@@ -12,22 +12,21 @@
     <!-- 네비게이션 바 -->
     <nav class="navbar">
         <div class="navbar_logo">
-            <a href="/">
-                <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="RootAir Logo">
+            <a href="{{ url_for('main.main') }}">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="로고">
             </a>
         </div>
         <ul class="navbar_menu">
-            <li><a href="#">예약</a></li>
-            <li><a href="#">공지사항</a></li>
-            <li><a href="#">문의사항</a></li>
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            <li class="navbar_signup"><a href="{{ url_for('member.sign_up') }}">회원가입</a></li>
-            <li class="navbar_login"><a href="{{ url_for('member.login_page') }}">로그인</a></li>
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
         </ul>
-        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18" alt="Toggle Button">
+        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>
     </nav>
-
     <!-- 로그인 페이지 -->
     <div class="login_page_wrapper">
         <header id="LoginType" class="login_wrap"></header>

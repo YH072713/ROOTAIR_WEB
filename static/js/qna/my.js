@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
             row.innerHTML = `
                 <td>${inquiry.inquiry_id}</td>
                 <td><a href="/qna/${inquiry.inquiry_id}">${inquiry.subject}</a></td>
-                <td>${inquiry.status}</td>
                 <td>${inquiry.created_at}</td>
             `;
             questionList.appendChild(row);

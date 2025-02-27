@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG이니시스 결제 테스트</title>
+
+    <!-- jQuery 먼저 로드 (async나 defer 속성 제거) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 포트원 SDK (iamport.payment.js) 로드 -->
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+
+
+    
+</head>
+<body>
+
+    <h2>KG이니시스 결제 테스트</h2>
+
+    <!-- 결제 요청 버튼 -->
+    <button id="paymentButton">결제하기</button>
+
+    <script>
+        $(document).ready(function() {
+            console.log("jQuery와 iamport.payment.js가 모두 로드되었습니다.");
+
+            // 결제 요청 버튼 클릭 시 결제 요청
+            $('#paymentButton').on('click', function() {
+                console.log('결제 요청 시작');
+
+                // IMP 객체가 정의되어 있는지 확인
+                if (typeof IMP !== 'undefined') {
+                    console.log("IMP 객체가 정상적으로 로드되었습니다.");
+                } else {
+                    console.log("IMP 객체가 정의되지 않았습니다.");
+                    return;
+                }
+                IMP.init("imp87014111"); // 예: 'imp00000000'
+
+                // IMP.request_pay로 결제창을 띄우기 위한 설정
+                IMP.request_pay({
+                    channelKey: 'channel-key-41f4a6cb-bf96-4f64-8e0b-4fda4256d7b6',  // 포트원에서 제공한 채널 키 입력
+                    pg: 'html5_inicis.INIpayTest',
+                    pay_method: "card",  // 결제 방법 (카드 결제)
+                    merchant_uid: "order_no_0001",  // 고유 주문 번호
+                    name: "주문명:결제테스트",  // 주문명
+                    amount: 1004,  // 결제 금액
+                    buyer_email: "test@portone.io",  // 구매자 이메일
+                    buyer_name: "rootair",  // 구매자 이름
+                    buyer_tel: "010-1234-5678",  // 구매자 전화번호
+                    buyer_addr: "서울특별시 강남구 삼성동",  // 구매자 주소
+                    buyer_postcode: "123-456",  // 구매자 우편번호
+                    m_redirect_url: "https://localhost:5000/result",  // 결제 완료 후 리디렉션될 URL
+                }, function(rsp) {
+                    if (rsp.success) {
+                        alert('결제 성공!');
+                    } else {
+                        console.error('결제 실패:', rsp.error_msg);
+                        alert('결제 실패: ' + rsp.error_msg);  // 에러 메시지 확인
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+
+

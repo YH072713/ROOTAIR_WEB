@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 정보 제공 동의</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 50px auto;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .checkbox-container {
+            margin-bottom: 20px;
+        }
+        input[type="checkbox"] {
+            transform: scale(1.2);
+            margin-right: 8px;
+        }
+        button {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>결제 정보 제공 동의</h2>
+
+    <!-- 결제 정보 -->
+    <div class="info-box">
+        총 결제 금액: <span id="display_total_price">{{ total_price }}</span> 원
+    </div>
+
+    <!-- 결제 동의 체크박스 -->
+    <div class="checkbox-container">
+        <input type="checkbox" id="consent">
+        <label for="consent">결제 정보 제공에 동의합니다.</label>
+    </div>
+
+    <!-- 결제 정보 전송 폼 -->
+    <form id="paymentInfoForm" action="/pay/process_payment" method="POST">
+        <input type="hidden" name="username" value="{{ passenger_username }}">
+        <input type="hidden" name="eng_name" value="{{ passenger_eng_name }}">
+        <input type="hidden" name="airplan_name" value="{{ airplan_name }}">
+        <input type="hidden" name="seat_class" value="{{ seat_class }}">
+        <input type="hidden" name="passenger_count" value="{{ passenger_count }}">
+        <input type="hidden" name="total_price" value="{{ total_price }}">
+        <input type="hidden" name="email" value="{{ email }}">
+        <input type="hidden" name="mileage_used" id="mileage_used_field" value="{{ mileage_used }}">
+
+        <button type="button" onclick="submitPayment()">결제 진행</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // GET 파라미터에서 데이터 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+    
+            document.getElementById("display_total_price").textContent = urlParams.get("total_price") + " 원";
+            document.getElementById("paymentInfoForm").elements["username"].value = urlParams.get("username");
+            document.getElementById("paymentInfoForm").elements["eng_name"].value = urlParams.get("eng_name");
+            document.getElementById("paymentInfoForm").elements["airplan_name"].value = urlParams.get("airplan_name");
+            document.getElementById("paymentInfoForm").elements["seat_class"].value = urlParams.get("seat_class");
+            document.getElementById("paymentInfoForm").elements["passenger_count"].value = urlParams.get("passenger_count");
+            document.getElementById("paymentInfoForm").elements["total_price"].value = urlParams.get("total_price");
+            document.getElementById("paymentInfoForm").elements["email"].value = urlParams.get("email");
+            document.getElementById("paymentInfoForm").elements["mileage_used"].value = urlParams.get("mileage_used");
+    
+            console.log("DEBUG: GET 파라미터로 전달된 데이터", Object.fromEntries(urlParams.entries()));
+        });
+    
+        function submitPayment() {
+            let consentChecked = document.getElementById("consent").checked;
+            if (!consentChecked) {
+                alert("결제 정보를 제공에 동의해야 합니다.");
+                return;
+            }
+    
+            let formData = new FormData(document.getElementById("paymentInfoForm"));
+    
+            fetch("/process_payment", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url; // 결제 완료 후 리디렉트
+                } else {
+                    alert("결제 처리 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("ERROR: ", error);
+                alert("결제 처리 중 오류가 발생했습니다.");
+            });
+        }
+    </script>
+    
+</body>
+</html>

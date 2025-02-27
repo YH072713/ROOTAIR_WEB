@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, jsonify, render_template, request, redirect, url_for, session
+from flask import Blueprint, current_app, jsonify, render_template, request, redirect, url_for, session, Response
 from flask_mail import Message
 from blueprints.utils import get_db_connection  # utils.py에서 함수 가져오기
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -120,9 +120,10 @@ def verify():
 ###########회원가입##############
 @member_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if current_user.is_authenticated:  # Flask-Login을 사용하는 경우, 로그인사용자의 경우 마이페이지로 보낸다다
-        return redirect(url_for('mypage.mypage'))
-    
+
+    if current_user.is_authenticated:  # 이미 로그인된 경우
+        return redirect(url_for('mypage.mypage'))  # 마이페이지로 리디렉트
+
     if request.method == 'GET':
         verified_email = session.get('verified_email')
         if not verified_email:
@@ -189,8 +190,10 @@ def check_id():
 ######################로그인#########################
 @member_bp.route('/login', methods=['GET'])
 def login_page():
-    if current_user.is_authenticated:  # Flask-Login을 사용하는 경우, 로그인사용자의 경우 마이페이지로 보낸다다
-        return redirect(url_for('mypage.mypage'))
+
+    if current_user.is_authenticated:  # 이미 로그인된 경우
+        return redirect(url_for('mypage.mypage'))  # 마이페이지로 리디렉트
+
     return render_template('member/member_login.html')
 
 @member_bp.route('/login', methods=['POST'])
@@ -210,8 +213,8 @@ def login():
 
             if user_data and check_password_hash(user_data['password'], password):
                 user = User(id=user_data['id'], user_id=user_data['user_id'])
-                login_user(user, remember=True)
-                session['user_id'] = user_data['id']
+                login_user(user, remember=False)
+                
                 return jsonify({"message": "Login successful"}), 200
             else:
                 return jsonify({"error": "Invalid user ID or password"}), 401
@@ -223,9 +226,16 @@ def login():
 @member_bp.route('/logout')
 @login_required
 def logout():
-    logout_user()
-    session.clear()
-    return jsonify({"message": "Logged out successfully"}), 200
+    """사용자 로그아웃 처리"""
+    logout_user()  # Flask-Login에서 사용자 로그아웃
+    session.clear()  # 모든 세션 데이터 삭제
+    session.modified = True  # Flask가 세션이 변경된 것을 인식하게 함
+
+    response = redirect(url_for('main.main'))  # 메인 페이지로 이동
+    response.set_cookie('session', '', expires=0)  # 클라이언트의 세션 쿠키 삭제
+    response.set_cookie('remember_token', '', expires=0)  # 클라이언트의 세션 쿠키 삭제
+
+    return response  # 로그아웃 후 세션이 유지되지 않도록 처리
 
 #####################회원정보 수정#########################################
 # @member_bp.route('/edit_info', methods=['GET', 'POST'])

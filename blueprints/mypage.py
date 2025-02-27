@@ -12,7 +12,9 @@ mypage_bp = Blueprint('mypage', __name__, url_prefix='/mypage')
 def mypage():
     """마이페이지를 렌더링하는 엔드포인트"""
 
-    return render_template('mypage/mypage.html', user=current_user)  # current_user 정보 전달
+    # 🔹 Flask-Login을 사용하여 로그인 여부 확인
+    if not current_user.is_authenticated:
+        return redirect(url_for('member.login'))  # 로그인 페이지로 리디렉트
 
     conn = get_db_connection()
     cursor = conn.cursor()

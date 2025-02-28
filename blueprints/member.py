@@ -196,7 +196,7 @@ def login():
 
     if not user_id or not password:
         return jsonify({"error": "User ID and password are required"}), 400
-
+#송민님꺼 적용
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:

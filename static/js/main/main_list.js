@@ -1,4 +1,3 @@
-// 현재 선택된 항공편 번호
 let currentFlight = 1;
 
 

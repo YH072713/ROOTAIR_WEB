@@ -9,6 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ url_for('static', filename='js/member/member_email.js') }}" defer></script>
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
 </head>
 <body>
     <!-- 네비게이션 바 -->
@@ -25,15 +35,14 @@
         </ul>
         <ul class="navbar_member">
             {% if session.get('admin', False) %}
-                <!-- 관리자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
+            <!-- 관리자 계정일 경우 -->
+            <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
+            <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
             {% elif current_user.is_authenticated %} 
-                <!-- 일반 사용자 계정일 경우 -->
+            <!-- 일반 사용자 계정일 경우 -->
                 <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
                 <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
             {% else %}
-                <!-- 비로그인 상태 -->
                 <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
                 <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
             {% endif %}
@@ -53,7 +62,7 @@
             </div>
 
             <!-- OTP 입력 및 확인 -->
-            <div id="otpSection">
+            <div id="otpSection" class="hidden">
                 <input type="text" id="otp" placeholder="인증 코드" required>
                 <button onclick="verifyOTP()">인증 코드 확인</button>
             </div>

@@ -23,19 +23,8 @@
             <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            {% if session.get('admin', False) %}
-                <!-- 관리자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('admin.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
-            {% elif current_user.is_authenticated %} 
-                <!-- 일반 사용자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
-            {% else %}
-                <!-- 비로그인 상태 -->
-                <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
-                <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
-            {% endif %}
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
         </ul>
         <img class="navbar_togglebtn" src="{{url_for('static',filename='images/topbar.jpg')}}" width="24" height="18"/>
     </nav>
@@ -43,17 +32,13 @@
         <h2>문의사항</h2>
         <div class="qna_detail">
             <div class="qna_detail_wrap">
-                <h3>{{inquiry.title}}</h3>                
-                <p> 첨부 파일:
-                    <a href="{{ url_for('qna.download_file', filename=inquiry.file.split('/')[-1]) }}" download>
-                        <img src="../../static/images/file.png" width="25" height="25"> 
-                    </a>
+                <h3>{{qna.title}}</h3>                
                 </p>
             </div>
             <p class="qna_info">
-                작성자: {{ inquiry.user_id }} | 작성일: {{ inquiry.created_at.strftime('%Y-%m-%d') }} 
-                {% if inquiry.file %}
-                    <a href="{{ url_for('qna.download_file', filename=inquiry.file.split('/')[-1]) }}" download>
+                작성자: {{ qna.user_id }} | 작성일: {{ qna.created_at.strftime('%Y-%m-%d') }} 
+                {% if qna.file %} | 첨부파일:
+                    <a href="{{ url_for('qna.download_file', filename=qna.file.split('/')[-1]) }}" download>
                         <img src="{{url_for('static',filename='images/file.png')}}" width="20" height="15"> 
                     </a>
                 {%else%}
@@ -61,13 +46,13 @@
                 {%endif%}
             </p>
             <hr>
-            <p>{{ inquiry.content }}</p>
+            <p>{{ qna.content }}</p>
             
         </div>
 
         <div class="admin_reply">
             <h4>관리자 답변</h4>
-            {{ inquiry.comment }}
+            {{ qna.comment }}
             {% if isAdmin %}
                 <div id="admin_reply_container">
                     <textarea id="admin_reply_input" placeholder="답변을 입력하세요"></textarea>
@@ -77,8 +62,12 @@
 
         <div class="btn_container">
             <button id="answerBtn" class="btn answer-btn" hidden>답변 등록</button>
-            <button id="editBtn" class="btn edit-btn" onclick="location.href='{{ url_for('qna.qna_edit_page', qna_id=qna_id) }}'">수정</button>
-            <button id="deleteBtn" class="btn delete-btn" data-qna-id="{{ inquiry.inquiry_id }}">삭제</button>
+            {% if current_user.user_id == qna.user_id %}
+                <button id="editBtn" class="btn edit-btn" onclick="location.href='{{ url_for('qna.qna_edit_page', qna_id=qna_id) }}'">수정</button>
+            {% endif %}
+            {% if current_user.user_id == qna.user_id %}
+            <button id="deleteBtn" class="btn delete-btn" data-qna-id="{{ qna.qna_id }}">삭제</button>
+            {% endif %}
             <button id="backBtn" class="btn back-btn" onclick="location.href='{{ url_for('qna.qna_page')}}'">목록보기</button>
         </div>
     </div>

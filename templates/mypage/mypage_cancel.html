@@ -7,7 +7,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mypage/mypage_cancel.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> 
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
     
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar">
@@ -31,7 +40,6 @@
                 <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
                 <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
             {% else %}
-                <!-- 비로그인 상태 -->
                 <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
                 <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
             {% endif %}
@@ -40,16 +48,6 @@
     </nav>
 </body>
 <body>
-    <script>
-        const togglebtn = document.querySelector('.navbar_togglebtn');
-        const menu = document.querySelector('.navbar_menu');
-        const member = document.querySelector('.navbar_member');
-
-        togglebtn.addEventListener('click', ()=>{
-            menu.classList.toggle('active');
-            member.classList.toggle('active');
-        });
-    </script>
     <div class="password-container">
         <h2>비밀번호를 입력해 주세요</h2>
         <form id="passwordForm">

@@ -1,5 +1,3 @@
-// main.js
-
 document.addEventListener('DOMContentLoaded', () => {
     // ✅ 공항 데이터 배열
 const airports = [
@@ -402,5 +400,3 @@ toggleModal(arrivalModal, false);
 // ✅ 모달 토글 함수
 const toggleModal = (modal, show) => modal.classList[show ? 'add' : 'remove']('show');
 });
-
-

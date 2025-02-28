@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DEBUG: 결제 정보 페이지 로드 완료");
 

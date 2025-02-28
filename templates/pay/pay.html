@@ -10,23 +10,45 @@
     <script src="https://stdpay.inicis.com/stdjs/INIStdPay.js"></script> 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
     
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar_logo">
-            <img src="{{ url_for('static', filename='images/rootair.jpg') }}" />
+            <a href="{{ url_for('main.main') }}">
+                <img src="{{url_for('static',filename='images/rootair.jpg')}}"/>
+            </a>
         </div>
         <ul class="navbar_menu">
-            <li><a href="#">예약</a></li>
-            <li><a href="#">공지사항</a></li>
-            <li><a href="#">문의사항</a></li>
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            <li class="navbar_signup"><a href="#">회원가입</a></li>
-            <li class="navbar_login"><a href="#">로그인</a></li>
+            {% if session.get('admin', False) %}
+            <!-- 관리자 계정일 경우 -->
+            <li class="navbar_signup"><a href="{{ url_for('admin.logout') }}">로그아웃</a></li>
+            <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
+        {% elif current_user.is_authenticated %} 
+            <!-- 일반 사용자 계정일 경우 -->
+            <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
+            <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
+        {% else %}
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+        {% endif %}
         </ul>
-        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>
+        <img class="navbar_togglebtn" src="{{url_for('static',filename='images/topbar.jpg')}}" width="24" height="18"/>
     </nav>
     
     <div class="container">

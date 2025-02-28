@@ -1,12 +1,4 @@
-// ✅ 헤더 토글 버튼 기능
-const togglebtn = document.querySelector('.navbar_togglebtn');
-const menu = document.querySelector('.navbar_menu');
-const member = document.querySelector('.navbar_member');
 
-togglebtn.addEventListener('click', () => {
-    menu.classList.toggle('active');
-    member.classList.toggle('active');
-});
 
 document.addEventListener("DOMContentLoaded", async function () {
     await fetchMembers();  // 페이지 로드 시 회원 목록 가져오기

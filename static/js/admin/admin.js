@@ -1,12 +1,4 @@
-// ✅ 헤더 토글 버튼 기능
-const togglebtn = document.querySelector('.navbar_togglebtn');
-const menu = document.querySelector('.navbar_menu');
-const member = document.querySelector('.navbar_member');
 
-togglebtn.addEventListener('click', () => {
-    menu.classList.toggle('active');
-    member.classList.toggle('active');
-});
 
 document.addEventListener("DOMContentLoaded", function() {
     // ✅ Flash 메시지 자동 제거 (5초 후)

@@ -1,12 +1,3 @@
-// ✅ 헤더 토글 버튼 기능
-const togglebtn = document.querySelector('.navbar_togglebtn');
-const menu = document.querySelector('.navbar_menu');
-const member = document.querySelector('.navbar_member');
-
-togglebtn.addEventListener('click', () => {
-    menu.classList.toggle('active');
-    member.classList.toggle('active');
-});
 
 // ✅ 탭 전환 기능
 function showTab(tabId) {

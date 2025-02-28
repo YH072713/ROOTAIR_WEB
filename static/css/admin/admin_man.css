@@ -173,8 +173,8 @@ a {
 }
 
 input[type="text"] {
-    width: 70%;
-    padding: 5px;
+    width: 90%;
+    padding: 3px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
@@ -202,14 +202,21 @@ input[type="text"] {
 }
 
 .delete-btn {
-        color: white;
-        cursor: pointer;
-        padding: 5px 10px;
-        border: 1px solid #ddd;
-        background-color: #555;
-        border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: #555;
+    border-radius: 5px;
 }
 
 .delete-btn:hover {
-        background-color: #333;
+    background-color: #333;
+}
+
+.admin_man_search {
+    text-align: left;
+    width: 25%;
+    margin-right: 10px;
+    padding: 20px;
 }

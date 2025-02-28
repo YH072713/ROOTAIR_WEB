@@ -151,7 +151,8 @@ a {
     text-align: left;
 }
 .admin_man_search {
-    text-align: right;
+    text-align: left;
+    width: 25%;
     margin-right: 10px;
     padding: 20px;
 }
@@ -198,4 +199,17 @@ input[type="text"] {
     background-color: #444;
     padding: 5px 10px;
     border-radius: 5px;
+}
+
+.delete-btn {
+        color: white;
+        cursor: pointer;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        background-color: #555;
+        border-radius: 5px;
+}
+
+.delete-btn:hover {
+        background-color: #333;
 }

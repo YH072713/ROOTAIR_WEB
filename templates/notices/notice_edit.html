@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>폐하의 전언을 정정하겠다</title>
+
+    <!-- Flask 방식으로 CSS 로드 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notices/notice_edit.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/notices/notice_edit.js') }}" defer></script>
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <a href="{{ url_for('main.main') }}">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="로고">
+            </a>
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            {% if session.get('admin', False) %}
+                <!-- 관리자 계정일 경우 -->
+                <li class="navbar_signup"><a href="{{ url_for('admin.logout') }}">로그아웃</a></li>
+                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
+            {% elif current_user.is_authenticated %} 
+                <!-- 일반 사용자 계정일 경우 -->
+                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
+                <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
+            {% else %}
+                <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+                <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="register_container_page">
+        <div class="register_container">
+            <h2>공지사항 수정</h2>
+
+            <form id="noticeForm" data-notice-id="{{ notices.notice_id }}" action="{{ url_for('notices.notice_edit_api',notice_id=notices.notice_id) }}" method="POST" enctype="multipart/form-data">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" value="{{ notice.title }}">
+
+                <label for="file">첨부 파일</label>
+                <div class="file-upload-container">
+                    <!-- 숨겨진 파일 업로드 input -->
+                    <input type="file" id="file" name="file" style="display: none;">
+                
+                    <!-- 기존 파일 정보를 유지하는 hidden input -->
+                    {% if notice.file %}
+                        <input type="file" id="fileUploadBtn" name="existing_file" value="{{ notices.file }}">
+                    {% endif %}
+                
+                    
+                </div>
+
+
+                <label for="content">내용</label>
+                <textarea class="editcontent" id="content" name="content">{{ notices.content }}</textarea>
+
+            <div class="btnandcheck">
+                
+                <div class="btaline">
+                    <button type="submit" id="submit_btn">공지 수정</button>
+                </div>
+            </div>
+            <div class="defaultfile_box">
+                <!-- 선택된 파일명 표시 -->
+                <label for="file">첨부되어있는파일</label>
+                <div class="defaultfile">
+                    
+                    <span id="fileNameDisplay">
+                        {% if notices.file %}
+                            <span id="existingFile">{{ notices.file.split('/')[-1] }}</span>
+                            <button type="button" id="removeFile">삭제</button>
+                        {% else %}
+                            선택된 파일 없음
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='js/notices/notice_edit.js') }}"></script>
+</body>
+<script>
+    document.getElementById("fileUploadBtn").addEventListener("click", function() {
+        document.getElementById("file").click(); // 파일 업로드 창 열기
+    });
+
+    document.getElementById("file").addEventListener("change", function(event) {
+        let fileInput = event.target;
+        let fileNameDisplay = document.getElementById("fileNameDisplay");
+
+        if (fileInput.files.length > 0) {
+            fileNameDisplay.innerHTML = fileInput.files[0].name +
+                ' <button type="button" id="removeFile">삭제</button>';
+            
+            // 기존 파일 정보 제거
+            let existingFileInput = document.getElementById("existingFileInput");
+            if (existingFileInput) {
+                existingFileInput.remove();
+            }
+
+            addRemoveEvent();
+        }
+    });
+
+    function addRemoveEvent() {
+        let removeBtn = document.getElementById("removeFile");
+        if (removeBtn) {
+            removeBtn.addEventListener("click", function() {
+                document.getElementById("file").value = ""; // 파일 선택 초기화
+                document.getElementById("fileNameDisplay").textContent = "선택된 파일 없음";
+
+                // 기존 파일 정보를 유지하기 위해 hidden input 다시 추가
+                let existingFileInput = document.getElementById("existingFileInput");
+                if (!existingFileInput && "{{ notices.file }}") {
+                    let hiddenInput = document.createElement("input");
+                    hiddenInput.type = "hidden";
+                    hiddenInput.id = "existingFileInput";
+                    hiddenInput.name = "existing_file";
+                    hiddenInput.value = "{{ notices.file }}";
+                    document.getElementById("noticeForm").appendChild(hiddenInput);
+                }
+            });
+        }
+    }
+
+    addRemoveEvent(); // 기존 파일이 있을 경우 삭제 버튼 이벤트 추가
+</script>
+</html>

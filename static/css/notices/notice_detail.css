@@ -176,8 +176,18 @@ a {
     justify-content: flex-end;
     margin-top: 10px;
 }
+#deleteBtn {
+    padding: 8px 12px;  
+    background-color: #ffacac;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 0 10px;  /* 좌우 간격 추가 */
+}
 
-.back_button, .edit_button, .delete_button {
+.back_button, .edit_button {
     padding: 8px 12px;
     background-color: #333;
     color: white;
@@ -185,7 +195,9 @@ a {
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
+    margin: 0 10px;  /* 좌우 간격 추가 */
 }
+
 
 .back_button:hover {
     background-color: #555;

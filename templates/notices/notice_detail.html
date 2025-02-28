@@ -59,10 +59,13 @@
             <div class="dateandfile">
                 <p class="notice_detail_meta">
                     <span class="notice_detail_date">{{ notice.created_at.strftime('%Y-%m-%d') }}</span>
-                    | 첨부 파일:
-                    <a href="{{ url_for('notices.download_file', filename=notice.file.split('/')[-1]) }}" download>
-                        <img src="{{url_for('static',filename='images/file.png')}}" width="20" height="15"> 
-                    </a>
+                    {% if notice.file %}
+    <a href="{{ url_for('notices.download_file', filename=notice.file.split('/')[-1]) }}" download>
+    <img src="{{ url_for('static', filename='images/file.png') }}" width="20" height="15">
+    </a>
+{% else %}
+{% endif %}
+
                 </p>
             </div>
             
@@ -77,7 +80,7 @@
                 <button onclick="goedit()" class="edit_button">수정</button>
             </div>
             <div class="detail_del_button">
-                <button onclick="godel()" class="del_button">삭제</button>
+                <button id="deleteBtn" class="btn delete-btn" >삭제</button>
             </div>
             <div class="detail_back_button">
                 <button onclick="goBack()" class="back_button">목록보기</button>

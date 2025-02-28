@@ -50,7 +50,7 @@ def notice_detail_page(notice_id):
     """공지사항 상세 페이지를 렌더링하는 엔드포인트"""
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT notice_id, title, content, created_at FROM notices WHERE notice_id = %s', (notice_id,))
+    cursor.execute('SELECT notice_id, title, file, content, created_at FROM notices WHERE notice_id = %s', (notice_id,))
     notice = cursor.fetchone()
     conn.close()
 
@@ -143,3 +143,98 @@ def notice_create_api():
 
     # ✅ 공지사항 목록 페이지로 리디렉트
     return jsonify({'message': '공지사항이 성공적으로 등록되었습니다.', 'redirect_url': url_for('notices.notices_page')})
+
+# 📌
+# 📌
+# 📌 공지사항 수정 페이지 (HTML 반환)
+@notices_bp.route('/edit/<int:notice_id>', methods=['GET'])
+def notice_edit_page(notice_id):
+    """문의사항 수정 페이지 렌더링"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT notice_id, title, content, file, is_secret
+        FROM notices
+        WHERE notice_id = %s
+    ''', (notice_id,))
+    
+    notice = cursor.fetchone()
+    conn.close()
+
+    if not notice:
+        return "문의사항을 찾을 수 없습니다.", 404
+
+    return render_template('notices/notice_edit.html', notice=notice)
+
+
+# 📌 문의사항 수정 API (POST 요청)
+@notices_bp.route('/api/edit/<int:notice_id>', methods=['POST'])
+def notice_edit_api(notice_id):
+    """문의사항을 수정하는 API"""
+    print(f"수정할 문의사항 ID: {notice_id}")
+
+    if not current_user.is_authenticated:
+        return jsonify({'error': '로그인이 필요합니다.'}), 403
+
+   # user_id = current_user.user_id
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # ✅ 해당 글이 존재하는지 확인 (그리고 user_id 가져오기)
+    cursor.execute("SELECT user_id FROM notices WHERE notice_id = %s", (notice_id,))
+    inquiry = cursor.fetchone()
+
+    if not inquiry:
+        conn.close()
+        return jsonify({'error': '문의사항을 찾을 수 없습니다.'}), 404
+
+    # inquiry_user_id = inquiry['user_id']  # ✅ 글 작성자의 user_id 가져오기
+
+    # ✅ 본인이 작성한 글인지 확인
+    # if user_id != inquiry_user_id:
+    #     conn.close()
+    #     return jsonify({'error': '본인이 작성한 글만 수정할 수 있습니다.'}), 403
+
+    # 요청 데이터 가져오기
+    data = request.form
+    title = data.get('title')
+    content = data.get('content')
+    is_private = data.get('isPrivate') == "true"
+
+    # 필수 필드 확인
+    if not title or not content:
+        return jsonify({'error': '제목과 내용을 입력하세요.'}), 400
+
+    # ✅ 기존 파일 유지
+    cursor.execute("SELECT file FROM notices WHERE notice_id = %s", (notice_id,))
+    existing_file_data = cursor.fetchone()
+    existing_file = existing_file_data['file'] if existing_file_data else None
+
+    file = request.files.get('file')
+    file_url = existing_file
+
+    if file:
+        filename = file.filename  # 원본 파일명 유지
+        file_path = f"static/uploads/{filename}"
+        file.save(file_path)
+        file_url = file_path  # 새로운 파일 저장
+
+    # ✅ 기존 글 수정
+    cursor.execute('''
+        UPDATE notices
+        SET title = %s, content = %s, file = %s, is_secret = %s
+        WHERE notice_id = %s
+    ''', (title, content, file_url, is_private, notice_id))
+
+    conn.commit()
+
+    # ✅ 수정이 정상적으로 이루어졌는지 확인
+    if cursor.rowcount == 0:
+        conn.close()
+        return jsonify({'error': '문의사항 수정에 실패했습니다. 해당 ID가 존재하지 않습니다.'}), 404
+
+
+    conn.close()
+
+    return jsonify({'message': '문의사항이 성공적으로 수정되었습니다.', 'redirect_url': url_for('notices.notice_page')})

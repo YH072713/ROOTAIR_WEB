@@ -40,7 +40,7 @@
     <div class="register_container">
         <h2>공지사항 등록</h2>
 
-        <form id="qnaForm" action="{{ url_for('qna.qna_create_api') }}" method="POST" enctype="multipart/form-data">
+        <form id="noticeForm" action="{{ url_for('notices.notice_create_api') }}" method="POST" enctype="multipart/form-data">
             <label for="title">제목</label>
             <input type="text" id="title" name="title" placeholder="제목을 입력하세요">
 

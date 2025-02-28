@@ -11,6 +11,16 @@
 
     <!-- Flask 방식으로 JS 로드 -->
     <script src="{{ url_for('static', filename='js/notices/notices.js') }}" defer></script>
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar">

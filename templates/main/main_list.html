@@ -6,11 +6,21 @@
     <title>Flight Select</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main/main_list.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar_logo">
-            <a href="URL">
+            <a href="{{ url_for('main.main') }}">
                 <img src="{{url_for('static',filename='images/rootair.jpg')}}"/>
             </a>
         </div>
@@ -35,17 +45,6 @@
         </ul>
         <img class="navbar_togglebtn" src="{{url_for('static',filename='images/topbar.jpg')}}" width="24" height="18"/>
     </nav>
-    <script>
-
-        const togglebtn = document.querySelector('.navbar_togglebtn');
-        const menu = document.querySelector('.navbar_menu');
-        const member = document.querySelector('.navbar_member');
-
-        togglebtn.addEventListener('click', ()=>{
-            menu.classList.toggle('active');
-            member.classList.toggle('active');
-        });
-    </script>
     <div class="flight-container">
         <div class="flight-header">
             <button class="arrow-btn left">◀</button>

@@ -10,12 +10,22 @@
     <script src="https://stdpay.inicis.com/stdjs/INIStdPay.js"></script> 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
     
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar_logo">
-            <a href="URL">
+            <a href="{{ url_for('main.main') }}">
                 <img src="{{url_for('static',filename='images/rootair.jpg')}}"/>
             </a>
         </div>

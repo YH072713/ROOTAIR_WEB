@@ -9,6 +9,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notices/notice_detail.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='js/notices/notice_detail.js') }}" defer></script>
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar">

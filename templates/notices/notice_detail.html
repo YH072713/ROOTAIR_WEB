@@ -52,7 +52,7 @@
                     <span class="notice_detail_date">{{ notice.created_at.strftime('%Y-%m-%d') }}</span>
                 </p>
                 <p> 첨부 파일:
-                    <a href="{{ url_for('qna.download_file', filename=inquiry.file.split('/')[-1]) }}" download>
+                    <a href="{{ url_for('notices.download_file', filename=notices.file.split('/')[-1]) }}" download>
                         <img src="../../static/images/file.png" width="25" height="25"> 
                     </a>
                 </p>

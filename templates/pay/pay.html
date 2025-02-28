@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pay/pay.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> 
+    <script src="https://stdpay.inicis.com/stdjs/INIStdPay.js"></script> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+    
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <img src="{{ url_for('static', filename='images/rootair.jpg') }}" />
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="#">예약</a></li>
+            <li><a href="#">공지사항</a></li>
+            <li><a href="#">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            <li class="navbar_signup"><a href="#">회원가입</a></li>
+            <li class="navbar_login"><a href="#">로그인</a></li>
+        </ul>
+        <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>
+    </nav>
+    
+    <div class="container">
+        <div class="left-section">
+            <div class="box">
+                <h2>항공권 선택 내역</h2>
+                <div id="flight-info">{{ flights_id }}</div>
+            </div>
+
+            <div class="box">
+                <h2>탑승자별 운임 내역</h2>
+                <div id="fare-info">{{ price }}</div>
+                <div class="final-amount-container">
+                    <p class="final-amount">총 운임:</p>
+                    <div class="final-price">
+                        <span id="final-amount">{{ total_price }}</span> KRW
+                    </div>
+                </div>
+            </div>
+
+            <div class="box mileage-section">
+                <h2>ROOT 마일리지</h2>
+                <div class="mileage-info">
+                    <p>보유 마일리지</p>
+                    <div class="mileage-value">
+                        <span id="total-mileage">{{ total_mileage }}</span> 마일리지
+                    </div>
+                </div>
+                <div class="mileage-input-wrapper">
+                    <label for="mileage-input">사용</label>
+                    <input type="number" id="mileage-input" placeholder="0">
+                </div>
+                <button id="apply-mileage">마일리지 적용</button>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="box payment-method">
+                <h2>결제 수단</h2>
+                <div class="payment-row">
+                    <button class="payment-item" id="rootpay"><p>Root PAY</p></button>
+                    <button class="payment-item" id="kg-inicis"><img src="{{ url_for('static', filename='images/kg_inicis_logo.png') }}" alt="KG 이니시스" width="80"></button>
+                </div>
+            </div>
+            
+            <div class="box">
+                <h2>결제 상세</h2>
+                <div id="rootpay-section">
+                    <p>
+                        <span>ROOT PAY 잔액</span>
+                        <span id="rootpay-balance">{{ balance }}</span>
+                        <span class="currency">KRW</span>
+                    </p>
+                    <p>
+                        <span>사용 마일리지</span>
+                        <span id="mileage-used">{{ mileage_used }}</span>
+                        <span class="currency">M</span>
+                    </p>
+                </div>
+                <div class="final-payment-container">
+                    <p>
+                        <span>최종 결제 금액</span>
+                        <span id="final-payment">{{ total_price }}</span>
+                        <span class="currency">KRW</span>
+                    </p>
+                </div>
+                
+            </div>
+
+            <div class="mileage-container">
+                <h2>마일리지 혜택</h2>
+                <div class="mileage-box">
+                    <div class="mileage-item">
+                        <span>현재 마일리지</span> <span id="current-mileage">{{ total_mileage }}</span> 마일리지
+                    </div>
+                    <div class="mileage-item">
+                        <span>적립 마일리지</span> <span id="earned-mileage">{{ earned_mileage }}</span> 마일리지
+                    </div>
+                    <div class="mileage-item">
+                        <span>결제 시 보유 마일리지</span> <span id="total-mileage-final">{{ final_mileage }}</span> 마일리지
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-section">
+                <button id="pay-button">결제</button>
+                <button id="cancel-button">취소</button>
+            </div>
+            <input type="hidden" id="flight_id" value="{{ flight_id }}"/>
+            <input type="hidden" id="passenger_count" value="{{ passenger_count }}"/>
+            <input type="hidden" id="user_id" value="{{ user_id }}">
+            <input type="hidden" id="username" value="{{ username }}">
+            <input type="hidden" id="eng_name" value="{{ eng_name }}">
+
+
+
+
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/pay/pay.js') }}"></script>
+</body>
+</html>

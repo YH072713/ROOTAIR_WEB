@@ -7,17 +7,7 @@
     <title>문의 수정</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/qna/qna_edit.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
-    <script src="{{ url_for('static', filename='js/qna/qna_edit.js') }}" defer></script>
-    <script>
-        const togglebtn = document.querySelector('.navbar_togglebtn');
-        const menu = document.querySelector('.navbar_menu');
-        const member = document.querySelector('.navbar_member');
-    
-        togglebtn.addEventListener('click', ()=>{
-            menu.classList.toggle('active');
-            member.classList.toggle('active');
-        });
-    </script>
+    <script src="qna_edit.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -32,18 +22,8 @@
             <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            {% if session.get('admin', False) %}
-                <!-- 관리자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('admin.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
-            {% elif current_user.is_authenticated %} 
-                <!-- 일반 사용자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
-            {% else %}
-                <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
-                <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
-            {% endif %}
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
         </ul>
         <img class="navbar_togglebtn" src="{{url_for('static',filename='images/topbar.jpg')}}" width="24" height="18"/>
     </nav>
@@ -51,9 +31,9 @@
         <div class="register_container">
             <h2>문의사항 수정</h2>
 
-            <form id="qnaForm" data-qna-id="{{ inquiry.inquiry_id }}" action="{{ url_for('qna.qna_edit_api',qna_id=inquiry.inquiry_id) }}" method="POST" enctype="multipart/form-data">
+            <form id="qnaForm" data-qna-id="{{ qna.qna_id }}" action="{{ url_for('qna.qna_edit_api',qna_id=qna.qna_id) }}" method="POST" enctype="multipart/form-data">
                 <label for="title">제목</label>
-                <input type="text" id="title" name="title" value="{{ inquiry.title }}">
+                <input type="text" id="title" name="title" value="{{ qna.title }}">
 
                 <label for="file">첨부 파일</label>
                 <div class="file-upload-container">
@@ -62,8 +42,8 @@
                 
                    
                     <!-- 기존 파일 정보를 유지하는 hidden input -->
-                    {% if inquiry.file %}
-                        <input type="file" id="fileUploadBtn" name="existing_file" value="{{ inquiry.file }}">
+                    {% if qna.file %}
+                        <input type="file" id="fileUploadBtn" name="existing_file" value="{{ qna.file }}">
                     {% endif %}
                 
                     
@@ -71,11 +51,11 @@
 
 
                 <label for="content">내용</label>
-                <textarea class="editcontent" id="content" name="content">{{ inquiry.content }}</textarea>
+                <textarea class="editcontent" id="content" name="content">{{ qna.content }}</textarea>
 
             <div class="btnandcheck">
                 <div class="checkbox_container">
-                    <input type="checkbox" id="private" name="isPrivate" {% if inquiry.is_secret %}checked{% endif %}>
+                    <input type="checkbox" id="private" name="isPrivate" {% if qna.is_secret %}checked{% endif %}>
                     <label for="private">비밀글</label>
                 </div>
                 <div class="btaline">
@@ -88,8 +68,8 @@
                 <div class="defaultfile">
                     
                     <span id="fileNameDisplay">
-                        {% if inquiry.file %}
-                            <span id="existingFile">{{ inquiry.file.split('/')[-1] }}</span>
+                        {% if qna.file %}
+                            <span id="existingFile">{{ qna.file.split('/')[-1] }}</span>
                             <button type="button" id="removeFile">삭제</button>
                         {% else %}
                             선택된 파일 없음
@@ -133,13 +113,13 @@
 
                 // 기존 파일 정보를 유지하기 위해 hidden input 다시 추가
                 let existingFileInput = document.getElementById("existingFileInput");
-                if (!existingFileInput && "{{ inquiry.file }}") {
+                if (!existingFileInput && "{{ qna.file }}") {
                     let hiddenInput = document.createElement("input");
                     hiddenInput.type = "hidden";
                     hiddenInput.id = "existingFileInput";
                     hiddenInput.name = "existing_file";
-                    hiddenInput.value = "{{ inquiry.file }}";
-                    document.getElementById("inquiryForm").appendChild(hiddenInput);
+                    hiddenInput.value = "{{ qna.file }}";
+                    document.getElementById("qnaForm").appendChild(hiddenInput);
                 }
             });
         }

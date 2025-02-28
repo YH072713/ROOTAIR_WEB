@@ -6,21 +6,11 @@
     <title>나의 문의</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/qna/qna.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
-    <script>
-        const togglebtn = document.querySelector('.navbar_togglebtn');
-        const menu = document.querySelector('.navbar_menu');
-        const member = document.querySelector('.navbar_member');
-    
-        togglebtn.addEventListener('click', ()=>{
-            menu.classList.toggle('active');
-            member.classList.toggle('active');
-        });
-    </script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar_logo">
-            <a href="{{ url_for('main.main') }}">
+            <a href="{{ url_for('reservation.main') }}">
                 <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="로고">
             </a>
         </div>
@@ -30,18 +20,8 @@
             <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            {% if session.get('admin', False) %}
-                <!-- 관리자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('admin.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
-            {% elif current_user.is_authenticated %} 
-                <!-- 일반 사용자 계정일 경우 -->
-            <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
-            <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
-        {% else %}
-            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
-            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
-        {% endif %}
+            <li class="navbar_signup"><a href="{{ url_for('login.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('login.login') }}">로그인</a></li>
         </ul>
     </nav>
 

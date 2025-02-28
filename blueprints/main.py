@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify
 from datetime import datetime 
 from blueprints.utils import get_db_connection
+from flask_login import login_required, current_user
 import uuid
 import traceback
 
@@ -16,7 +17,7 @@ def main():
 # 항공권 조회 페이지 라우트
 @main_bp.route('/list', methods=['GET'])
 def search_results():
-    # URL 쿼리승트링에서 검색 조건을 가져옴
+    # URL 쿼리스트링에서 검색 조건을 가져옴
     departure_airport = request.args.get('departure_airport')
     arrival_airport = request.args.get('arrival_airport')
     departure_date_raw = request.args.get('departure_date')
@@ -78,66 +79,88 @@ def flight_detail(flight_id):
     return render_template('main/main_list_detail.html', flight=flight, passenger_count=passenger_count)
 
 # 예약(구매) 처리 라우트
-from flask import jsonify
-
-from flask import session
-
-
 @main_bp.route('/book', methods=['POST'])
+@login_required
 def book_flight():
+    
+    # POST 데이터에서 flight_id와 탑승객들의 영문 이름 리스트를 가져옴
     flight_id = request.form.get('flight_id', type=int)
-    eng_names = request.form.getlist("eng_name[]")  # ✅ 리스트로 가져오기
+    eng_names = request.form.getlist('eng_name[]')
 
-    print(f"DEBUG: 받은 eng_names 원본 값 = {request.form.getlist('eng_name')}")  # 🔥 원본 데이터 확인
-    print(f"DEBUG: 받은 flight_id 값 = {flight_id}")  # 🔥 flight_id 확인
-
-    # ✅ 로그인된 사용자 정보 가져오기
-    user_id = 'tester'  # 이후 세션으로 적용해야함
-
+    # 로그인된 사용자의 user_id 확인
+    user_id = session.get('user_id')
     if not user_id:
-        return "로그인이 필요합니다.", 403
+        return jsonify({"error": "User not logged in"}), 401
 
-    if not flight_id or not eng_names or eng_names == [""]:  # ✅ 빈 리스트 필터링
-        print("ERROR: 필수 예약 정보가 누락되었습니다.")
+    if not flight_id or not eng_names:
         return "필수 예약 정보가 누락되었습니다.", 400
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # ✅ 사용자 `username`, `balance` 조회
-    cursor.execute("SELECT username, mileage, balance FROM users WHERE user_id = %s", (user_id,))
-    user_data = cursor.fetchone()
-    if not user_data:
+
+    # users 테이블에서 id에 해당하는 username 조회
+    cursor.execute("SELECT username, mileage, balance, email, phone_number FROM users WHERE id = %s", (current_user.id,))
+    user = cursor.fetchone()
+    if not user:
         return "사용자 정보를 찾을 수 없습니다.", 404
+    username = user["username"]
+    total_mileage = user["mileage"]
+    balance = user["balance"]
+    email = user["email"]
+    phone_number = user["phone_number"]
 
-    username = user_data["username"]
-    total_mileage = user_data["mileage"]
-    balance = user_data["balance"]
 
-    # ✅ 예약 대상 항공편 정보 조회
+    # 예약 대상 항공편 정보를 조회
     cursor.execute("SELECT * FROM flights WHERE flight_id = %s", (flight_id,))
     flight = cursor.fetchone()
     if not flight:
         return "해당 항공편이 존재하지 않습니다.", 404
 
-    # ✅ 단일 예약 ID 생성
+    # 예약 가능한 좌석 수 확인
+    available_seats = flight["passenger_count"]
+    if available_seats < len(eng_names):
+        return "예약 가능한 좌석이 부족합니다.", 400
+
+    # ★ 단일 예약 ID를 미리 생성 (모든 탑승객 예약에 동일하게 사용)
     booking_id = str(uuid.uuid4())[:20]
 
-    # ✅ 총 결제 금액 계산
+        # ✅ 총 결제 금액 계산
     price = flight["price"]
     total_price = price * len(eng_names)
     earned_mileage = int(total_price * 0.1)
 
-    cursor.close()
-    conn.close()
 
-    print(f"DEBUG: 변환된 eng_name = {', '.join(eng_names)}")  # ✅ 변환된 값 확인
+    # 예약 후 해당 항공편의 남은 좌석 수 업데이트
+    cursor.execute("""
+        UPDATE flights SET passenger_count = passenger_count - %s WHERE flight_id = %s
+    """, (len(eng_names), flight_id))
+    conn.commit()
+
+    # ★ 사용자 정보 조회
+    cursor.execute("SELECT mileage FROM users WHERE id = %s", (current_user.id,))
+    user_data = cursor.fetchone()
+    if user_data:
+        total_mileage = user_data["mileage"]
+    else:
+        total_mileage = 0
+
+    # 1인 운임
+    seat_price = flight["price"]
+
+    # 모든 탑승객 합산 운임
+    total_price = seat_price * len(eng_names)
+
+    # 적립 마일리지는 총 결제 금액의 10%
+    earned_mileage = int(total_price * 0.1)
 
     return render_template(
         'pay/pay.html',
         booking_id=booking_id,
         user_id=user_id,
         username=username,
+        email=email,
+        phone_number=phone_number,
         eng_name=", ".join(eng_names) if eng_names != [""] else "Unknown",  # ✅ 빈 리스트 방지
         total_mileage=total_mileage,
         earned_mileage=earned_mileage,
@@ -153,4 +176,3 @@ def book_flight():
         departure_time=flight["departure_time"],
         arrival_time=flight["arrival_time"]
     )
-

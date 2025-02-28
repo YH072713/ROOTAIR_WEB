@@ -1,8 +1,10 @@
 from flask import Blueprint, current_app, flash, render_template, request, jsonify, session, redirect, url_for
+import pymysql
 from blueprints.utils import get_db_connection
 from flask_login import login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+from pymysql.cursors import DictCursor
 
 # 블루프린트 생성
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/mypage')
@@ -12,9 +14,8 @@ mypage_bp = Blueprint('mypage', __name__, url_prefix='/mypage')
 def mypage():
     """마이페이지를 렌더링하는 엔드포인트"""
 
-    # 🔹 Flask-Login을 사용하여 로그인 여부 확인
-    if not current_user.is_authenticated:
-        return redirect(url_for('member.login'))  # 로그인 페이지로 리디렉트
+    if 'user_id' not in session:
+        return redirect(url_for('member.login'))
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -25,7 +26,7 @@ def mypage():
         cursor.execute("SELECT * FROM users WHERE id = %s", (current_user.id,))
         user = cursor.fetchone()
         
-        cursor.execute("SELECT booking_id FROM bookings WHERE username = %s", (current_user.username,))
+        cursor.execute("SELECT booking_id FROM bookings WHERE username = %s AND payment_status = 'Paid'", (current_user.username,))
         flight_cnt = cursor.fetchall()
         
     except Exception as e:
@@ -37,71 +38,71 @@ def mypage():
 
     return render_template('mypage/mypage.html', user=user, flight_cnt=len(flight_cnt))  # ✅ 예약 데이터는 API에서 별도로 가져옴
 
-# ✅ 항공권 예약 정보를 JSON으로 반환하는 API
-# @mypage_bp.route('/get_tickets')
-# @login_required
-# def get_tickets():
-    # """예약된 항공권 정보를 JSON 데이터로 반환하는 API"""
-    # if 'user_id' not in session:
-    #     return jsonify({"error": "user not logged in"}), 401            
-    
-    # conn = get_db_connection()
-    # cursor = conn.cursor()
+@mypage_bp.route('/get_tickets')
+@login_required
+def get_tickets():
+    """예약된 항공권 정보를 JSON 데이터로 반환하는 API"""
+    if 'user_id' not in session:
+        return redirect(url_for('member.login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
     # ✅ 사용자의 예약 정보 가져오기
-    # cursor.execute("SELECT * FROM Users WHERE id = %s", (current_user.id,))
-    # tickets = cursor.fetchone()
+    cursor.execute("SELECT * FROM Users WHERE id = %s", (current_user.id,))
+    tickets = cursor.fetchone()
 
-    # cursor.close()
-    # conn.close()
+    cursor.close()
+    conn.close()
 
-    #processed_tickets = []
-    # for ticket in tickets:
-    #     # eng_name을 "성"과 "이름"으로 분리 (예: "Kim Minsoo")
-    #     full_name = ticket["eng_name"]
-    #     name_parts = full_name.split(" ", 1)  # 앞에서부터 최대 2부분만 분리
-    #     if len(name_parts) == 2:
-    #         first_name, last_name = name_parts
-    #     else:
-    #         # 단어가 1개만 있거나 여러 개 있을 경우 등을 처리
-    #         first_name = name_parts[0]
-    #         last_name = "" if len(name_parts) == 1 else " ".join(name_parts[1:])
+    processed_tickets = []
+    for ticket in tickets:
+        # eng_name을 "성"과 "이름"으로 분리 (예: "Kim Minsoo")
+        full_name = ticket["eng_name"]
+        name_parts = full_name.split(" ", 1)  # 앞에서부터 최대 2부분만 분리
+        if len(name_parts) == 2:
+            first_name, last_name = name_parts
+        else:
+            # 단어가 1개만 있거나 여러 개 있을 경우 등을 처리
+            first_name = name_parts[0]
+            last_name = "" if len(name_parts) == 1 else " ".join(name_parts[1:])
 
-    #     # departure_time, arrival_time을 원하는 형태로 포매팅
-    #     # DB에서 DATETIME 타입으로 가져왔다고 가정 (dictionary=True 이면 datetime 객체로 반환)
-    #     departure_dt = ticket["departure_time"]
-    #     arrival_dt = ticket["arrival_time"]
+        # departure_time, arrival_time을 원하는 형태로 포매팅
+        # DB에서 DATETIME 타입으로 가져왔다고 가정 (dictionary=True 이면 datetime 객체로 반환)
+        departure_dt = ticket["departure_time"]
+        arrival_dt = ticket["arrival_time"]
 
-    #     # "Fri, 17 MAY 2022" 형태로 생성 (요일, 일, 월(대문자), 연도)
-    #     departure_date_str = f"{departure_dt.strftime('%a, %d')} {departure_dt.strftime('%b').upper()} {departure_dt.strftime('%Y')}"
-    #     arrival_date_str = f"{arrival_dt.strftime('%a, %d')} {arrival_dt.strftime('%b').upper()} {arrival_dt.strftime('%Y')}"
+        # "Fri, 17 MAY 2022" 형태로 생성 (요일, 일, 월(대문자), 연도)
+        departure_date_str = f"{departure_dt.strftime('%a, %d')} {departure_dt.strftime('%b').upper()} {departure_dt.strftime('%Y')}"
+        arrival_date_str = f"{arrival_dt.strftime('%a, %d')} {arrival_dt.strftime('%b').upper()} {arrival_dt.strftime('%Y')}"
 
-    #     # "02:16" 형태 (24시간제 시:분)
-    #     departure_time_str = departure_dt.strftime('%H:%M')
-    #     arrival_time_str = arrival_dt.strftime('%H:%M')
+        # "02:16" 형태 (24시간제 시:분)
+        departure_time_str = departure_dt.strftime('%H:%M')
+        arrival_time_str = arrival_dt.strftime('%H:%M')
 
-    #     processed_ticket = {
-    #         "booking_id": ticket["booking_id"],
-    #         "reservation_code": ticket["reservation_code"],
-    #         "username": ticket["username"],
-    #         "first_name": first_name,  
-    #         "last_name": last_name,    
-    #         "airplane_name": ticket["airplane_name"],
-    #         "departure_airport": ticket["departure_airport"],
-    #         "arrival_airport": ticket["arrival_airport"],
-    #         "price": ticket["price"],
-    #         "cabin_class": ticket["cabin_class"],
-    #         "age": ticket["age"],
+        processed_ticket = {
+            "booking_id": ticket["booking_id"],
+            "reservation_code": ticket["reservation_code"],
+            "username": ticket["username"],
+            "first_name": first_name,  
+            "last_name": last_name,    
+            "airplane_name": ticket["airplane_name"],
+            "departure_airport": ticket["departure_airport"],
+            "arrival_airport": ticket["arrival_airport"],
+            "price": ticket["price"],
+            "cabin_class": ticket["cabin_class"],
+            "age": ticket["age"],
 
-    #         # 새로 추가한 필드
-    #         "departure_date": departure_date_str,
-    #         "departure_time": departure_time_str,
-    #         "arrival_date": arrival_date_str,
-    #         "arrival_time": arrival_time_str
-    #     }
-    #     processed_tickets.append(processed_ticket)
+            # 새로 추가한 필드
+            "departure_date": departure_date_str,
+            "departure_time": departure_time_str,
+            "arrival_date": arrival_date_str,
+            "arrival_time": arrival_time_str
+        }
+        processed_tickets.append(processed_ticket)
         
-    # return jsonify(processed_tickets)
+    return jsonify(processed_tickets)
+
 
 @mypage_bp.route('/edit', methods=['GET', 'POST'])
 @login_required

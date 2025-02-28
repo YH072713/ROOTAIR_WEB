@@ -1,20 +1,17 @@
-from flask import Blueprint, render_template, request, jsonify, url_for, redirect
+from flask import Blueprint, render_template, request, jsonify, url_for, redirect, send_file
 from blueprints.utils import get_db_connection
+from flask_login import login_required, current_user
 import traceback
 import uuid
 import base64, json
 from datetime import datetime
 
-# pay_bp = Blueprint("pay", __name__, template_folder="templates/pay")
 pay_bp = Blueprint('pay', __name__, url_prefix='/pay')
 
-
-
-# ✅ `GET /get_mileage`에서 user_id 기반으로 마일리지 조회
 @pay_bp.route("/get_mileage", methods=["GET"])
 def get_mileage():
     try:
-        user_id = request.args.get("user_id")  # ✅ 기존 email → user_id로 변경
+        user_id = request.args.get("current_user.id,")  # ✅ 기존 email → user_id로 변경
 
         if not user_id:
             return jsonify({"error": "사용자 ID가 제공되지 않았습니다."}), 400
@@ -23,7 +20,7 @@ def get_mileage():
         cursor = conn.cursor()
 
         # ✅ 마일리지 조회 (user_id 기준)
-        cursor.execute("SELECT mileage FROM users WHERE user_id = %s", (user_id,))
+        cursor.execute("SELECT mileage FROM users WHERE user_id = %s", (current_user.id,))
         user_data = cursor.fetchone()
 
         if not user_data:
@@ -39,51 +36,6 @@ def get_mileage():
         return jsonify({"error": "서버 오류 발생", "details": str(e)}), 500
 
 
-
-
-
-
-from flask import send_file
-
-# @pay_bp.route("/payment_info", methods=["GET"])
-# def payment_info():
-#     try:
-#         # ✅ GET 요청에서 데이터 받아오기
-#         print(f"DEBUG: request.args = {request.args}")  # 🔥 서버에서 실제 GET 요청 데이터를 출력
-
-#         total_price = request.args.get("total_price")
-#         username = request.args.get("username")
-#         eng_name = request.args.get("eng_name")
-#         airplane_name = request.args.get("airplane_name")
-#         seat_class = request.args.get("seat_class")
-#         passenger_count = request.args.get("passenger_count")
-#         email = request.args.get("email")
-#         mileage_used = request.args.get("mileage_used")
-
-#         # ✅ 필수 데이터 확인 (누락된 데이터가 있는지 확인)
-#         if not total_price or not username or not eng_name:
-#             print("ERROR: 필수 데이터가 누락되었습니다.")
-#             return "필수 데이터가 누락되었습니다.", 400
-
-#         print(f"DEBUG: Payment Info - total_price={total_price}, username={username}, eng_name={eng_name}")
-
-#         # ✅ HTML에 전달할 데이터 구성
-#         return render_template("payment_info.html",
-#                                total_price=int(total_price),
-#                                passenger_username=username,
-#                                passenger_eng_name=eng_name,
-#                                airplane_name=airplane_name,
-#                                seat_class=seat_class,
-#                                passenger_count=passenger_count,
-#                                email=email,
-#                                mileage_used=mileage_used)
-
-#     except Exception as e:
-#         print(f"ERROR: 서버 오류 발생 - {e}")  # 🔥 콘솔에서 실제 오류 메시지를 출력
-#         return f"서버 오류 발생: {str(e)}", 500
-
-
-
 @pay_bp.route("/payment_info", methods=["GET"])
 def payment_info():
     try:
@@ -92,37 +44,43 @@ def payment_info():
         # ✅ GET 파라미터에서 데이터 추출
         flight_id = request.args.get("flight_id")
         total_price = request.args.get("total_price")
-        username = request.args.get("username")
-        user_id = request.args.get("user_id")
+        user_id = request.args.get("user_id")  # 🚀 수정: 올바른 user_id 요청 방식
         passenger_count = request.args.get("passenger_count")
         final_mileage = request.args.get("final_mileage")
         remaining_balance = request.args.get("remaining_balance")
         eng_name = request.args.get("eng_name")
 
-        # 🔥 flight_id 없으면 에러 반환
-        if not flight_id:
-            return jsonify({"error": "필수 데이터 누락: flight_id"}), 400
+        # 🔥 필수 데이터 검증
+        if not flight_id or not user_id:
+            return jsonify({"error": "필수 데이터 누락"}), 400
 
-        # ✅ `flights` 데이터 제거 (더 이상 사용하지 않음)
+        # ✅ DB에서 username 가져오기 (user_id가 존재하는지 확인)
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+        user_data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not user_data:
+            print(f"ERROR: 사용자 ID({user_id})를 찾을 수 없음")
+            return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
+
+        username = user_data["username"]  # 🚀 DB에서 가져온 username 사용
+
         return render_template("pay/pay_info.html",
-                               final_mileage = final_mileage,
-                               remaining_balance = remaining_balance,
-                               total_price=total_price,
-                               username=username,
-                               user_id=user_id,
-                               eng_name=eng_name,
-                               passenger_count=passenger_count,
-                               flight_id=flight_id)  # 🔥 `flights` 관련 데이터 제거
+                            final_mileage=final_mileage,
+                            remaining_balance=remaining_balance,
+                            total_price=total_price,
+                            username=username,  # 🚀 username을 DB에서 가져온 값으로 설정
+                            user_id=user_id,
+                            eng_name=eng_name,
+                            passenger_count=passenger_count,
+                            flight_id=flight_id)
 
     except Exception as e:
         print(f"ERROR: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
-
-
-
-
-
 
 
 # ✅ 결제 처리 (이메일 인증 없이)
@@ -171,8 +129,8 @@ def process_payment():
         # ✅ `flights` 테이블에서 `flight_id`에 해당하는 데이터 가져오기
         cursor.execute("""
             SELECT airplane_name, seat_class, departure_airport, arrival_airport, 
-                   DATE_FORMAT(departure_time, '%%Y-%%m-%%d %%H:%%i:%%s') AS departure_time, 
-                   DATE_FORMAT(arrival_time, '%%Y-%%m-%%d %%H:%%i:%%s') AS arrival_time
+                DATE_FORMAT(departure_time, '%%Y-%%m-%%d %%H:%%i:%%s') AS departure_time, 
+                DATE_FORMAT(arrival_time, '%%Y-%%m-%%d %%H:%%i:%%s') AS arrival_time
             FROM flights WHERE flight_id = %s
         """, (flight_id,))
         flight_data = cursor.fetchone()
@@ -205,17 +163,26 @@ def process_payment():
         booking_id = str(uuid.uuid4())[:20]
 
         # ✅ `bookings` 테이블에 데이터 저장
+        cursor.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+        user_data = cursor.fetchone()
+
+        if not user_data or not user_data["username"]:
+            print(f"ERROR: 사용자 ID({user_id})를 찾을 수 없음 또는 username이 NULL")
+            return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
+
+        username = user_data["username"]  # 🚀 username을 DB에서 가져옴
+        
         cursor.execute(""" 
             INSERT INTO bookings (booking_id, user_id, username, eng_name, airplane_name, seat_class,
-                                  departure_airport, arrival_airport, 
-                                  departure_time, arrival_time, price, payment_status)
-            VALUES (%s, %s, (SELECT username FROM users WHERE user_id = %s), %s, %s, %s, %s, %s, %s, %s, %s, 'Paid')
+            departure_airport, arrival_airport, 
+            departure_time, arrival_time, price, payment_status)
+            VALUES (%s, %s, (SELECT username FROM users WHERE id = %s), %s, %s, %s, %s, %s, %s, %s, %s, 'Paid')
         """, (booking_id, user_id, user_id, eng_name, airplane_name, seat_class,
-              departure_airport, arrival_airport, departure_time, arrival_time, total_price))
+            departure_airport, arrival_airport, departure_time, arrival_time, total_price))
 
         # ✅ `users` 테이블의 마일리지 및 Root PAY 업데이트 (JS에서 계산된 값 사용)
         cursor.execute("UPDATE users SET mileage = %s, balance = %s WHERE user_id = %s", 
-                       (final_mileage, remaining_balance, user_id))
+                    (final_mileage, remaining_balance, user_id))
         conn.commit()
 
         print(f"DEBUG: 사용자 {user_id} - 남은 마일리지 = {final_mileage}, 남은 Root PAY = {remaining_balance}")
@@ -264,4 +231,3 @@ def result(booking_id):
     except Exception as e:
         print(f"ERROR: /pay/result 처리 중 예외 발생 - {str(e)}")  # ✅ 예외 출력
         return f"서버 오류 발생: {str(e)}", 500  # ✅ 500 에러 메시지 반환
-

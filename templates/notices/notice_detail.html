@@ -47,9 +47,17 @@
         <h2>공지사항</h2>
         <div class="notice_detail_wrap">
             <h3 id="notice_detail_title">{{ notice.title }}</h3>
-            <p class="notice_detail_meta">
-                <span class="notice_detail_date">{{ notice.created_at.strftime('%Y-%m-%d') }}</span>
-            </p>
+            <div class="dateandfile">
+                <p class="notice_detail_meta">
+                    <span class="notice_detail_date">{{ notice.created_at.strftime('%Y-%m-%d') }}</span>
+                </p>
+                <p> 첨부 파일:
+                    <a href="{{ url_for('qna.download_file', filename=inquiry.file.split('/')[-1]) }}" download>
+                        <img src="../../static/images/file.png" width="25" height="25"> 
+                    </a>
+                </p>
+            </div>
+            
         </div>
 
         <div class="notice_detail_content">
@@ -57,7 +65,15 @@
         </div>
 
         <div class="detail_button">
-            <button onclick="goBack()" class="back_button">목록보기</button>
+            <div class="detail_edit_button">
+                <button onclick="goedit()" class="edit_button">수정</button>
+            </div>
+            <div class="detail_del_button">
+                <button onclick="godel()" class="del_button">삭제</button>
+            </div>
+            <div class="detail_back_button">
+                <button onclick="goBack()" class="back_button">목록보기</button>
+            </div>
         </div>
     </div>
 

@@ -134,14 +134,7 @@ a {
     object-fit: cover; 
     display: block;
 }
-.notice_detail_container {
-    margin-left: 50px;
-    width: 90%;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
+
 
 .notice_detail_container h2 {
     font-size: 22px;
@@ -196,4 +189,91 @@ a {
 
 .back_button:hover {
     background-color: #555;
+}
+
+
+
+
+/* 공지목록창 */
+
+
+.notice_detail_container {
+    width: 90%;
+    margin-top: 0px;
+    margin-left: 50px; 
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    position: relative;  /* 하위 absolute 요소의 기준이 됨 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 내부 요소를 위/아래로 정렬 */
+}
+
+/* 버튼 영역 꾸미기 */
+.submit_button {
+    position: absolute;  /* 부모 요소 기준으로 위치 설정 */
+    bottom: 20px;  /* 부모의 아래쪽에서 20px 띄움 */
+    right: 20px;  /* 부모의 오른쪽에서 20px 띄움 */
+
+    display: flex;  /* 내부 요소 정렬 */
+    align-items: center;
+    justify-content: center;
+
+    width: 120px;  /* 영역 너비 */
+    height: 50px;  /* 영역 높이 */
+    
+    border-radius: 12px;  /* 둥근 모서리 */
+    padding: 10px;
+}
+
+/* 버튼 영역 */
+.submit_button {
+    position: relative;  /* 부모 요소 내에서 정렬 */
+    width: 100%;  /* 부모 너비에 맞게 확장 */
+    display: flex;  
+    justify-content: flex-end; /* 내부 버튼을 우측 정렬 */
+    align-items: center;
+    padding: 10px 0;
+    margin-top: auto; /* 부모의 하단에 배치 */
+}
+
+/* 버튼 스타일 */
+.adsubmit_button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #84bfff; /* 밝은 파란색 */
+    border: none;
+    border-radius: 8px; /* 둥근 모서리 */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 버튼 호버 효과 */
+.adsubmit_button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* 버튼 클릭 효과 */
+.adsubmit_button:active {
+    background-color: #004494;
+    transform: translateY(0);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 반응형 스타일 (모바일) */
+@media (max-width: 600px) {
+    .adsubmit_button {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
+    }
 }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>황제폐하의 전언이다</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notices/notice_create.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/notices/notice_create.js') }}" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_logo">
+            <a href="{{ url_for('main.main') }}">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}"/>
+            </a>
+        </div>
+        <ul class="navbar_menu">
+            <li><a href="{{ url_for('main.main') }}">예약</a></li>
+            <li><a href="{{ url_for('notices.notices_page') }}">공지사항</a></li>
+            <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
+        </ul>
+        <ul class="navbar_member">
+            {% if session.get('admin', False) %}
+                <!-- 관리자 계정일 경우 -->
+                <li class="navbar_signup"><a href="{{ url_for('admin.logout') }}">로그아웃</a></li>
+                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
+            {% elif current_user.is_authenticated %} 
+                <!-- 일반 사용자 계정일 경우 -->
+                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
+                <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
+            {% else %}
+                <!-- 비로그인 상태 -->
+                <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+                <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+            {% endif %}
+        </ul>
+        <img class="navbar_togglebtn" src="{{url_for('static',filename='images/topbar.jpg')}}" width="24" height="18"/>
+    </nav>
+    <div class="register_container">
+        <h2>공지사항 등록</h2>
+
+        <form id="qnaForm" action="{{ url_for('qna.qna_create_api') }}" method="POST" enctype="multipart/form-data">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" placeholder="제목을 입력하세요">
+
+            <label for="file">첨부 파일</label>
+            <input type="file" id="file" name="file">
+
+            <label for="content">내용</label>
+            <textarea id="content" name="content" placeholder="내용을 입력하세요"></textarea>
+
+            <button type="submit" id="submit_btn">공지 등록</button>
+
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='js/qna/qna_create.js') }}" defer></script>
+</body>
+</html>

@@ -65,9 +65,13 @@
             <button id="prevPage" class="page-btn">← Previous</button>
             <span id="pageNumbers"></span>
             <button id="nextPage" class="page-btn">Next →</button>
-         </div>
+        </div>
         <div class="submit_button">
-            <button onclick="gosubmit()" class="adsubmit_button" hidden>공지 등록</button>
+            <!--<button onclick="gosubmit()" class="adsubmit_button" hidden>공지 등록</button>-->
+            {% if session.get('admin', False) %}
+                <button onclick="gosubmit()" class="adsubmit_button">공지 등록</button>
+            {% endif %}
+
         </div>
     </div>
 </body>

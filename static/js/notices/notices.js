@@ -84,3 +84,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchNotices();
 });
+
+
+// 공지사항 등록 버튼 구현
+function gosubmit() {
+    window.location.href = "/notices/create";  // 공지 등록 페이지로 이동
+}

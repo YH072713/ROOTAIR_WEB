@@ -2,25 +2,25 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentPage = 1;
     const itemsPerPage = 3;
 
-    function fetchMyInquiries(page) {
+    function fetchMyqna(page) {
         fetch(`/qna/api/my?page=${page}`)
             .then(response => response.json())
             .then(data => {
-                displayMyInquiries(data.inquiries);
+                displayMyqna(data.qna);
                 createPaginationButtons(data.total_pages, page);
             })
             .catch(error => console.error("나의 문의 데이터를 불러오는 중 오류 발생:", error));
     }
 
-    function displayMyInquiries(inquiries) {
+    function displayMyqna(qna) {
         let questionList = document.getElementById("question-list");
         questionList.innerHTML = "";
 
-        inquiries.forEach(inquiry => {
+        qna.forEach(inquiry => {
             let row = document.createElement("tr");
             row.innerHTML = `
-                <td>${inquiry.inquiry_id}</td>
-                <td><a href="/qna/${inquiry.inquiry_id}">${inquiry.subject}</a></td>
+                <td>${inquiry.qna_id}</td>
+                <td><a href="/qna/${inquiry.qna_id}">${inquiry.subject}</a></td>
                 <td>${inquiry.created_at}</td>
             `;
             questionList.appendChild(row);
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
             prevButton.innerText = "← Previous";
             prevButton.onclick = () => {
                 currentPage--;
-                fetchMyInquiries(currentPage);
+                fetchMyqna(currentPage);
             };
             pagination.appendChild(prevButton);
         }
@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", function () {
             nextButton.innerText = "Next →";
             nextButton.onclick = () => {
                 currentPage++;
-                fetchMyInquiries(currentPage);
+                fetchMyqna(currentPage);
             };
             pagination.appendChild(nextButton);
         }
     }
 
-    fetchMyInquiries(currentPage);
+    fetchMyqna(currentPage);
 });

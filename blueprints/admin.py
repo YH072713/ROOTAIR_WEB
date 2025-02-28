@@ -1,12 +1,24 @@
 from flask import Blueprint, render_template, jsonify, request, current_app, session, flash, redirect, url_for
 from blueprints.utils import get_db_connection
+from flask_login import login_user
+from flask_login import UserMixin
+
 
 # 📌 Flask Blueprint 생성 (이름 반드시 'admin_bp'으로 맞출 것)
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+# User 형식
+
+class User(UserMixin):
+    def __init__(self, id, user_id, password=None):
+        self.id = id
+        self.user_id = user_id
+        self.password = password
+
 # 📌 관리자 로그인 페이지
 
 @admin_bp.route('/', methods=['GET', 'POST'])
+
 def admin_login():
     if request.method == 'POST':
         user_id = request.form.get('user_id')
@@ -31,6 +43,8 @@ def admin_login():
         conn.close()
         
         if user:
+            admin_user = User(id=user['id'], user_id=user['user_id'])  # Flask-Login의 User 모델 사용
+            login_user(admin_user, remember=False)  # 🔹 Flask-Login을 통해 로그인 처리
             session['admin'] = True # 관리자 세션 설정
             session['user_id'] = user_id  # 로그인한 사용자의 아이디를 세션에 저장
             current_app.logger.info("로그인 성공: user_id=%s", user_id)
@@ -93,7 +107,7 @@ def delete_member():
     return jsonify({"message": "Member deleted successfully"})
 
 @admin_bp.route('/logout')
-def admin_logout():
+def logout():
     session.clear()  # 모든 세션 데이터 삭제 (로그아웃)
     flash("로그아웃되었습니다.", "info")
     return redirect(url_for('admin.admin_login'))  # 로그인 페이지로 이동

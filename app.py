@@ -40,8 +40,9 @@ mail = Mail(app)
 
 
 class User(UserMixin):
-    def __init__(self, id, username, password):
+    def __init__(self, id,user_id, username, password):
         self.id = id
+        self.user_id=user_id
         self.username = username
         self.password = password
 
@@ -55,11 +56,11 @@ def load_user(user_id):
     connection.close()
 
     if user_data:
-        return User(id=user_data['id'], username=user_data['username'], password=user_data['password'])
+        return User(id=user_data['id'],user_id=user_data['user_id'], username=user_data['username'], password=user_data['password'])
     return None
 
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

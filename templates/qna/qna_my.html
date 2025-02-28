@@ -20,10 +20,16 @@
             <li><a href="{{ url_for('qna.qna_page') }}">문의사항</a></li>
         </ul>
         <ul class="navbar_member">
-            {% if current_user.id %}
+            {% if session.get('admin', False) %}
+                <!-- 관리자 계정일 경우 -->
+                <li class="navbar_signup"><a href="{{ url_for('admin.logout') }}">로그아웃</a></li>
+                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
+            {% elif current_user.is_authenticated %} 
+                <!-- 일반 사용자 계정일 경우 -->
                 <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
                 <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
             {% else %}
+                <!-- 비로그인 상태 -->
                 <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
                 <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
             {% endif %}

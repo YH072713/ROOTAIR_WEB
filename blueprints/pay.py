@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, jsonify, url_for, redirect
+from flask import Blueprint, render_template, request, jsonify, url_for, redirect, send_file
 from blueprints.utils import get_db_connection
+from flask_login import login_required, current_user
 import traceback
 import uuid
 import base64, json
@@ -10,7 +11,7 @@ pay_bp = Blueprint('pay', __name__, url_prefix='/pay')
 @pay_bp.route("/get_mileage", methods=["GET"])
 def get_mileage():
     try:
-        user_id = request.args.get("user_id")  # ✅ 기존 email → user_id로 변경
+        user_id = request.args.get("current_user.id,")  # ✅ 기존 email → user_id로 변경
 
         if not user_id:
             return jsonify({"error": "사용자 ID가 제공되지 않았습니다."}), 400
@@ -19,7 +20,7 @@ def get_mileage():
         cursor = conn.cursor()
 
         # ✅ 마일리지 조회 (user_id 기준)
-        cursor.execute("SELECT mileage FROM users WHERE user_id = %s", (user_id,))
+        cursor.execute("SELECT mileage FROM users WHERE user_id = %s", (current_user.id,))
         user_data = cursor.fetchone()
 
         if not user_data:
@@ -35,51 +36,6 @@ def get_mileage():
         return jsonify({"error": "서버 오류 발생", "details": str(e)}), 500
 
 
-
-
-
-
-from flask import send_file
-
-# @pay_bp.route("/payment_info", methods=["GET"])
-# def payment_info():
-#     try:
-#         # ✅ GET 요청에서 데이터 받아오기
-#         print(f"DEBUG: request.args = {request.args}")  # 🔥 서버에서 실제 GET 요청 데이터를 출력
-
-#         total_price = request.args.get("total_price")
-#         username = request.args.get("username")
-#         eng_name = request.args.get("eng_name")
-#         airplane_name = request.args.get("airplane_name")
-#         seat_class = request.args.get("seat_class")
-#         passenger_count = request.args.get("passenger_count")
-#         email = request.args.get("email")
-#         mileage_used = request.args.get("mileage_used")
-
-#         # ✅ 필수 데이터 확인 (누락된 데이터가 있는지 확인)
-#         if not total_price or not username or not eng_name:
-#             print("ERROR: 필수 데이터가 누락되었습니다.")
-#             return "필수 데이터가 누락되었습니다.", 400
-
-#         print(f"DEBUG: Payment Info - total_price={total_price}, username={username}, eng_name={eng_name}")
-
-#         # ✅ HTML에 전달할 데이터 구성
-#         return render_template("payment_info.html",
-#                                total_price=int(total_price),
-#                                passenger_username=username,
-#                                passenger_eng_name=eng_name,
-#                                airplane_name=airplane_name,
-#                                seat_class=seat_class,
-#                                passenger_count=passenger_count,
-#                                email=email,
-#                                mileage_used=mileage_used)
-
-#     except Exception as e:
-#         print(f"ERROR: 서버 오류 발생 - {e}")  # 🔥 콘솔에서 실제 오류 메시지를 출력
-#         return f"서버 오류 발생: {str(e)}", 500
-
-
-
 @pay_bp.route("/payment_info", methods=["GET"])
 def payment_info():
     try:
@@ -88,37 +44,43 @@ def payment_info():
         # ✅ GET 파라미터에서 데이터 추출
         flight_id = request.args.get("flight_id")
         total_price = request.args.get("total_price")
-        username = request.args.get("username")
-        user_id = request.args.get("user_id")
+        user_id = request.args.get("user_id")  # 🚀 수정: 올바른 user_id 요청 방식
         passenger_count = request.args.get("passenger_count")
         final_mileage = request.args.get("final_mileage")
         remaining_balance = request.args.get("remaining_balance")
         eng_name = request.args.get("eng_name")
 
-        # 🔥 flight_id 없으면 에러 반환
-        if not flight_id:
-            return jsonify({"error": "필수 데이터 누락: flight_id"}), 400
+        # 🔥 필수 데이터 검증
+        if not flight_id or not user_id:
+            return jsonify({"error": "필수 데이터 누락"}), 400
 
-        # ✅ `flights` 데이터 제거 (더 이상 사용하지 않음)
+        # ✅ DB에서 username 가져오기 (user_id가 존재하는지 확인)
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+        user_data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not user_data:
+            print(f"ERROR: 사용자 ID({user_id})를 찾을 수 없음")
+            return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
+
+        username = user_data["username"]  # 🚀 DB에서 가져온 username 사용
+
         return render_template("pay/pay_info.html",
-                            final_mileage = final_mileage,
-                            remaining_balance = remaining_balance,
+                            final_mileage=final_mileage,
+                            remaining_balance=remaining_balance,
                             total_price=total_price,
-                            username=username,
+                            username=username,  # 🚀 username을 DB에서 가져온 값으로 설정
                             user_id=user_id,
                             eng_name=eng_name,
                             passenger_count=passenger_count,
-                            flight_id=flight_id)  # 🔥 `flights` 관련 데이터 제거
+                            flight_id=flight_id)
 
     except Exception as e:
         print(f"ERROR: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
-
-
-
-
-
 
 
 # ✅ 결제 처리 (이메일 인증 없이)
@@ -201,11 +163,20 @@ def process_payment():
         booking_id = str(uuid.uuid4())[:20]
 
         # ✅ `bookings` 테이블에 데이터 저장
+        cursor.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+        user_data = cursor.fetchone()
+
+        if not user_data or not user_data["username"]:
+            print(f"ERROR: 사용자 ID({user_id})를 찾을 수 없음 또는 username이 NULL")
+            return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
+
+        username = user_data["username"]  # 🚀 username을 DB에서 가져옴
+        
         cursor.execute(""" 
             INSERT INTO bookings (booking_id, user_id, username, eng_name, airplane_name, seat_class,
             departure_airport, arrival_airport, 
             departure_time, arrival_time, price, payment_status)
-            VALUES (%s, %s, (SELECT username FROM users WHERE user_id = %s), %s, %s, %s, %s, %s, %s, %s, %s, 'Paid')
+            VALUES (%s, %s, (SELECT username FROM users WHERE id = %s), %s, %s, %s, %s, %s, %s, %s, %s, 'Paid')
         """, (booking_id, user_id, user_id, eng_name, airplane_name, seat_class,
             departure_airport, arrival_airport, departure_time, arrival_time, total_price))
 

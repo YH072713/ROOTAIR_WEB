@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify, url_for,jsonify,
 from blueprints.utils import get_db_connection
 from datetime import datetime
 import pytz  # ✅ 한국 시간 변환을 위한 라이브러리 추가
+import os
 
 # 블루프린트 생성
 notices_bp = Blueprint('notices', __name__, url_prefix='/notices')
@@ -61,6 +62,7 @@ def notice_detail_page(notice_id):
 @notices_bp.route('/api/<int:notice_id>')
 def notice_detail_api(notice_id):
     """공지사항 상세 데이터를 JSON으로 반환하는 API 엔드포인트"""
+    print('여기까지가 공지사항 api')# 여기오니?
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT notice_id, title, content, created_at FROM notices WHERE notice_id = %s', (notice_id,))
@@ -73,6 +75,19 @@ def notice_detail_api(notice_id):
     # ✅ `created_at`을 문자열로 변환
     if 'created_at' in notice and notice['created_at'] is not None:
         notice['created_at'] = notice['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+
+    # ✅ 파일이 있는 경우 파일 경로 추가
+    file_url = None
+    if notice['file']:
+        file_url = url_for('notices.download_file', filename=os.path.basename(notice['file']))  
+
+        return jsonify({
+            'notice_id': notice['notice_id'],
+            'title': notice['title'],
+            'content': notice['content'],
+            'created_at': notice['created_at'],
+            'file_url': file_url  # ✅ 파일 다운로드 URL 추가
+        })
 
     return jsonify(notice)
 

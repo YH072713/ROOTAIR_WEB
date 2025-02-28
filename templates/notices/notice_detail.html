@@ -59,10 +59,9 @@
             <div class="dateandfile">
                 <p class="notice_detail_meta">
                     <span class="notice_detail_date">{{ notice.created_at.strftime('%Y-%m-%d') }}</span>
-                </p>
-                <p> 첨부 파일:
-                    <a href="{{ url_for('notices.download_file', filename=notices.file.split('/')[-1]) }}" download>
-                        <img src="../../static/images/file.png" width="25" height="25"> 
+                    | 첨부 파일:
+                    <a href="{{ url_for('notices.download_file', filename=notice.file.split('/')[-1]) }}" download>
+                        <img src="{{url_for('static',filename='images/file.png')}}" width="20" height="15"> 
                     </a>
                 </p>
             </div>

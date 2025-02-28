@@ -62,7 +62,7 @@
                 {% for notice in notices %}
                 <tr>
                     <td>📢 공지사항</td>
-                    <td><a href="{{ url_for('notices.notices_page', notice_id=notice.notice_id) }}" class="notice_link">{{ notice.title }}</a></td>
+                    <td><a href="{{ url_for('notices.notice_detail_page', notice_id=notice.notice_id) }}" class="notice_link">{{ notice.title }}</a></td>
                     <td>{{ notice.created_at.strftime('%Y-%m-%d') }}</td>
                 </tr>
                 {% endfor %}

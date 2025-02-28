@@ -8,6 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='js/admin/admin.js') }}" defer></script>
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> 
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
     <style>
         /* ✅ Flash 메시지 스타일 (폼 중앙에 정렬) */
         .flash-messages {
@@ -45,17 +55,16 @@
         </ul>
         <ul class="navbar_member">
             {% if session.get('admin', False) %}
-                <!-- 관리자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
+            <!-- 관리자 계정일 경우 -->
+            <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
+            <li class="navbar_login"><a href="{{ url_for('admin.admin_management') }}">회원정보</a></li>
             {% elif current_user.is_authenticated %} 
-                <!-- 일반 사용자 계정일 경우 -->
-                <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
-                <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
+            <!-- 일반 사용자 계정일 경우 -->
+            <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
+            <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
             {% else %}
-                <!-- 비로그인 상태 -->
-                <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
-                <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
+            <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
+            <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
             {% endif %}
         </ul>
         <img class="navbar_togglebtn" src="{{ url_for('static', filename='images/topbar.jpg') }}" width="24" height="18"/>

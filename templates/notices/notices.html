@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>공지사항</title>
 
     <!-- Flask 방식으로 CSS 로드 -->
@@ -12,6 +11,16 @@
 
     <!-- Flask 방식으로 JS 로드 -->
     <script src="{{ url_for('static', filename='js/notices/notices.js') }}" defer></script>
+    <script>
+        const togglebtn = document.querySelector('.navbar_togglebtn');
+        const menu = document.querySelector('.navbar_menu');
+        const member = document.querySelector('.navbar_member');
+    
+        togglebtn.addEventListener('click', ()=>{
+            menu.classList.toggle('active');
+            member.classList.toggle('active');
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar">
@@ -35,7 +44,6 @@
                 <li class="navbar_signup"><a href="{{ url_for('member.logout') }}">로그아웃</a></li>
                 <li class="navbar_login"><a href="{{ url_for('mypage.mypage') }}">마이페이지</a></li>
             {% else %}
-                <!-- 비로그인 상태 -->
                 <li class="navbar_signup"><a href="{{ url_for('member.signup') }}">회원가입</a></li>
                 <li class="navbar_login"><a href="{{ url_for('member.login') }}">로그인</a></li>
             {% endif %}

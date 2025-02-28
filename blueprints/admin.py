@@ -1,8 +1,9 @@
+import hashlib
 from flask import Blueprint, render_template, jsonify, request, current_app, session, flash, redirect, url_for
 from blueprints.utils import get_db_connection
 from flask_login import login_user
 from flask_login import UserMixin
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # 📌 Flask Blueprint 생성 (이름 반드시 'admin_bp'으로 맞출 것)
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -15,17 +16,31 @@ class User(UserMixin):
         self.user_id = user_id
         self.password = password
 
+def check_scrypt_password(stored_password, user_password):
+    try:
+        algorithm, n, r, p, salt, hashed_password = stored_password.split('$')
+        n, r, p = int(n), int(r), int(p)
+        
+        # 입력 비밀번호 해시
+        hashed_input = hashlib.scrypt(
+            user_password.encode('utf-8'),
+            salt=salt.encode('utf-8'),
+            n=n,
+            r=r,
+            p=int(p),
+            dklen=64
+        ).hex()
+        
+        return hashed_input == hashed_password
+    except ValueError:
+        return False        
+
 # 📌 관리자 로그인 페이지
-
 @admin_bp.route('/', methods=['GET', 'POST'])
-
 def admin_login():
     if request.method == 'POST':
         user_id = request.form.get('user_id')
         password = request.form.get('password')
-
-        print(user_id)
-        print(password)
         
         current_app.logger.debug("로그인 시도: user_id=%s", user_id)
         
@@ -33,16 +48,16 @@ def admin_login():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        query = "SELECT * FROM users WHERE user_id = %s AND password = %s AND isadmin = %s"
+        query = "SELECT * FROM users WHERE user_id = %s AND isadmin = %s"
         current_app.logger.debug("실행할 쿼리: %s", query)
-        cursor.execute(query, (user_id, password, 1))
+        cursor.execute(query, (user_id, 1))
         user = cursor.fetchone()
         current_app.logger.debug("쿼리 결과: %s", user)
         
         cursor.close()
         conn.close()
         
-        if user:
+        if user and check_password_hash(user['password'], password): # 🔹 비밀번호 해시 검증
             admin_user = User(id=user['id'], user_id=user['user_id'])  # Flask-Login의 User 모델 사용
             login_user(admin_user, remember=False)  # 🔹 Flask-Login을 통해 로그인 처리
             session['admin'] = True # 관리자 세션 설정
@@ -64,6 +79,7 @@ def admin_management():
         return redirect(url_for('admin.admin_login'))  # 로그인 페이지로 이동
 
     return render_template("admin/admin_man.html")  # 관리자일 경우만 페이지 렌더링
+
 # get member data API
 @admin_bp.route('/get_members', methods=['GET'])
 def get_members():

@@ -1,4 +1,5 @@
-from flask import Blueprint, current_app, jsonify, render_template, request, redirect, url_for, session
+#from curses import flash
+from flask import Blueprint, current_app, jsonify, render_template, request, redirect, url_for, session, flash
 from flask_mail import Message
 from blueprints.utils import get_db_connection  # utils.py에서 함수 가져오기
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -20,7 +21,7 @@ class User(UserMixin):
         self.id = id
         self.user_id = user_id
         self.password = password
-
+ 
 @member_bp.route('/protected')
 @login_required
 def protected():
@@ -35,7 +36,7 @@ def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
 @member_bp.route('/email-confirm', methods=['GET'])
-
+@login_required
 def email_confirm_page():
     return render_template('member/member_email.html')
 
@@ -196,7 +197,7 @@ def login():
 
     if not user_id or not password:
         return jsonify({"error": "User ID and password are required"}), 400
-#송민님꺼 적용
+
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
@@ -222,9 +223,12 @@ def login():
 def logout():
     logout_user()
     session.clear()
-    
-    return jsonify({"message": "Logged out successfully", "redirect": url_for('main.main')}), 200
+    response = redirect(url_for('main.main'))  # 메인 페이지로 이동
+    response.set_cookie('remember_token', '', expires=0)  # 자동 로그인 쿠키 삭제
 
+    print(f"After logout: {current_user.is_authenticated}")  # 로그아웃 후 상태 확인
+
+    return response
 
 ###########################비밀번호 찾기##########################################
 
@@ -236,8 +240,8 @@ def generate_otp():
 
 
 # ✅ HTML 페이지 렌더링
-@member_bp.route('find')
-def find():
+@member_bp.route('/forgot_password')
+def forgot_password():
     return render_template('member/member_find.html')
 
 # step 1

@@ -35,7 +35,7 @@ def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
 @member_bp.route('/email-confirm', methods=['GET'])
-@login_required
+
 def email_confirm_page():
     return render_template('member/member_email.html')
 
@@ -212,13 +212,17 @@ def login():
             user_data = cursor.fetchone()
 
             if user_data and check_password_hash(user_data['password'], password):
-                if user_data['isadmin'] == 1:
-                    return jsonify({"error": "Administrators cannot log in through this interface"}), 403
+                if user_data['isadmin'] == 1: # 관리자 계정일 경우
+                    session['admin'] = True  # ✅ 관리자 세션 설정
+                    session['user_id'] = user_data['user_id']
+                    session['role'] = 'admin'  # ✅ 역할 기반 세션 추가
                 
-                user = User(id=user_data['id'], user_id=user_data['user_id'])
-                login_user(user, remember=False)
+                    user = User(id=user_data['id'], user_id=user_data['user_id'])
+                    login_user(user, remember=False)
                 
-                return jsonify({"message": "Login successful"}), 200
+                    return jsonify({"message": "Login successful"}), 200
+                else:
+                    return jsonify({"error": "Only administrators can log in here"}), 403
             else:
                 return jsonify({"error": "Invalid user ID or password"}), 401
     except Exception as e:
@@ -251,8 +255,8 @@ def generate_otp():
 
 
 # ✅ HTML 페이지 렌더링
-@member_bp.route('/forgot_password')
-def forgot_password():
+@member_bp.route('find')
+def find():
     return render_template('member/member_find.html')
 
 # step 1

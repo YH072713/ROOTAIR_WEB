@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, jsonify, render_template, request, redirect, url_for, session, Response
+from flask import Blueprint, current_app, jsonify, render_template, request, redirect, url_for, session
 from flask_mail import Message
 from blueprints.utils import get_db_connection  # utils.py에서 함수 가져오기
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -120,14 +120,11 @@ def verify():
 ###########회원가입##############
 @member_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
-
-    if current_user.is_authenticated:  # 이미 로그인된 경우
-        return redirect(url_for('mypage.mypage'))  # 마이페이지로 리디렉트
-
     if request.method == 'GET':
-        if not session.get('email_verified'):
-            return redirect(url_for('member.email_confirm_page'))
-        return render_template('member/signup.html')
+        verified_email = session.get('verified_email')
+        if not verified_email:
+            return redirect(url_for('member.main'))  # 이메일 인증 페이지로 리다이렉션
+        return render_template('member/member_signup.html', email=verified_email)
     
     if request.method == 'POST':
         data = request.json
@@ -189,11 +186,6 @@ def check_id():
 ######################로그인#########################
 @member_bp.route('/login', methods=['GET'])
 def login_page():
-
-
-    if current_user.is_authenticated:  # 이미 로그인된 경우
-        return redirect(url_for('mypage.mypage'))  # 마이페이지로 리디렉트
-
     return render_template('member/member_login.html')
 
 @member_bp.route('/login', methods=['POST'])
@@ -212,17 +204,12 @@ def login():
             user_data = cursor.fetchone()
 
             if user_data and check_password_hash(user_data['password'], password):
-                if user_data['isadmin'] == 1: # 관리자 계정일 경우
-                    session['admin'] = True  # ✅ 관리자 세션 설정
-                    session['user_id'] = user_data['user_id']
-                    session['role'] = 'admin'  # ✅ 역할 기반 세션 추가
-                
-                    user = User(id=user_data['id'], user_id=user_data['user_id'])
-                    login_user(user, remember=False)
-                
-                    return jsonify({"message": "Login successful"}), 200
-                else:
-                    return jsonify({"error": "Only administrators can log in here"}), 403
+                if user_data['isadmin'] == 1:
+                    return jsonify({"error": "Administrators cannot log in through this interface"}), 403
+                user = User(id=user_data['id'], user_id=user_data['user_id'])
+                login_user(user, remember=True)
+                session['user_id'] = user_data['id']
+                return jsonify({"message": "Login successful"}), 200
             else:
                 return jsonify({"error": "Invalid user ID or password"}), 401
     except Exception as e:
@@ -233,16 +220,10 @@ def login():
 @member_bp.route('/logout')
 @login_required
 def logout():
-    """사용자 로그아웃 처리"""
-    logout_user()  # Flask-Login에서 사용자 로그아웃
-    session.clear()  # 모든 세션 데이터 삭제
-    session.modified = True  # Flask가 세션이 변경된 것을 인식하게 함
-
-    response = redirect(url_for('main.main'))  # 메인 페이지로 이동
-    response.set_cookie('session', '', expires=0)  # 클라이언트의 세션 쿠키 삭제
-    response.set_cookie('remember_token', '', expires=0)  # 클라이언트의 세션 쿠키 삭제
-
-    return response  # 로그아웃 후 세션이 유지되지 않도록 처리
+    logout_user()
+    session.clear()
+    
+    return jsonify({"message": "Logged out successfully", "redirect": url_for('main.main')}), 200
 
 
 ###########################비밀번호 찾기##########################################

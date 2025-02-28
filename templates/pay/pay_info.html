@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 정보 제공 동의</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 50px auto;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .checkbox-container {
+            margin-bottom: 20px;
+        }
+        input[type="checkbox"] {
+            transform: scale(1.2);
+            margin-right: 8px;
+        }
+        button {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>결제 정보 제공 동의</h2>
+
+    <!-- 결제 정보 -->
+    <div class="info-box">
+        총 결제 금액: <span id="display_total_price">{{ total_price }}</span> 원
+        <p>DEBUG: 출발 시간 = {{ departure_time }}</p> <!-- 🔥 실제 값 확인 -->
+<input type="hidden" id="departure_time" name="departure_time" value="{{ departure_time }}">
+<input type="hidden" id="arrival_time" name="arrival_time" value="{{ arrival_time }}">
+
+    </div>
+
+    <!-- 결제 동의 체크박스 -->
+    <div class="checkbox-container">
+        <input type="checkbox" id="consent">
+        <label for="consent">결제 정보 제공에 동의합니다.</label>
+    </div>
+
+    <!-- 결제 정보 전송 폼 -->
+    <form id="paymentInfoForm" action="/pay/process_payment" method="POST">
+<!-- 🔥 더 이상 필요 없는 `Flights` 데이터 제거 -->
+        <input type="hidden" id="flight_id" name="flight_id" value="{{ flight_id }}">
+        <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
+        <input type="hidden" id="total_price" name="total_price" value="{{ total_price }}">
+        <input type="hidden" id="passenger_count" name="passenger_count" value="{{ passenger_count }}">
+        <input type="hidden" id="email" name="email" value="{{ email }}">
+        <input type="hidden" id="eng_name" name="eng_name" value="{{ eng_name }}">
+        <input type="hidden" id="final_mileage" name="final_mileage" value="{{ final_mileage }}">
+        <input type="hidden" id="remaining_balance" name="remaining_balance" value="{{ remaining_balance }}">
+
+
+
+
+
+        <button type="button" onclick="submitPayment()">결제 진행</button>
+    </form>
+
+
+    <script src="{{ url_for('static', filename='js/pay/pay_info.js') }}"></script>
+    <!-- <script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DEBUG: 결제 정보 페이지 로드 완료");
+
+    // ✅ GET 파라미터에서 데이터 가져오기
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log("DEBUG: GET 파라미터 =", Object.fromEntries(urlParams.entries())); // 🔥 GET 데이터 확인
+
+    // ✅ HTML에 데이터 표시
+    document.getElementById("display_total_price").textContent = urlParams.get("total_price") || "0";
+
+    // ✅ 폼 데이터 자동 채움 (오타 수정 및 기본값 설정)
+    let form = document.getElementById("paymentInfoForm");
+
+    form.elements["username"].value = urlParams.get("username") || "Unknown User";
+    form.elements["eng_name"].value = urlParams.get("eng_name") || "N/A";  // ✅ `eng_name` 포함
+    form.elements["airplane_name"].value = urlParams.get("airplane_name") || "Unknown Flight";
+    form.elements["seat_class"].value = urlParams.get("seat_class") || "Economy";
+    form.elements["passenger_count"].value = urlParams.get("passenger_count") || "1";
+    form.elements["total_price"].value = urlParams.get("total_price") || "0";
+    form.elements["email"].value = urlParams.get("email") || "example@email.com";
+    form.elements["mileage_used"].value = urlParams.get("mileage_used") || "0";
+});
+
+function submitPayment() {
+    let consentChecked = document.getElementById("consent").checked;
+    if (!consentChecked) {
+        alert("결제 정보를 제공에 동의해야 합니다.");
+        return;
+    }
+
+    let formData = new FormData(document.getElementById("paymentInfoForm"));
+
+    // ✅ `eng_name` 값이 폼에 포함되는지 확인
+    console.log("DEBUG: 전송할 formData 데이터:");
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]} = ${pair[1]}`);
+    }
+
+    fetch("/pay/process_payment", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("DEBUG: 서버 응답 데이터 =", data);
+        if (data.redirect_url) {
+            // ✅ 부모 창이 존재하면 부모 창으로 리디렉트 메시지 전송
+            if (window.opener) {
+                window.opener.postMessage({ redirect_url: data.redirect_url }, "*");
+            }
+            window.close();  // ✅ 자식 창 닫기
+        } else {
+            alert("결제 실패: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("ERROR: 결제 요청 실패", error);
+        alert("결제 요청 중 오류가 발생했습니다.");
+    });
+}
+
+    </script> -->
+    
+    
+</body>
+</html>

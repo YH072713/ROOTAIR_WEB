@@ -18,7 +18,7 @@
             menu.classList.toggle('active');
             member.classList.toggle('active');
         });
-    </script>
+    </script> 
 </head>
 <body>
     <nav class="navbar">
@@ -76,12 +76,14 @@
         </div>
 
         <div class="detail_button">
+            {% if session.get('admin', False) %}
             <div class="detail_edit_button">
-                <button onclick="goedit()" class="edit_button">수정</button>
-            </div>
+                <button id="editBtn" data-notice-id="{{ notice.notice_id }}" onclick="goedit()" class="edit_button">수정</button>
+            </div>            
             <div class="detail_del_button">
-                <button id="deleteBtn" class="btn delete-btn" data-notice-id="{{ notice.notice_id }}">삭제</button>
+            <button id="deleteBtn" class="btn delete-btn" data-notice-id="{{ notice.notice_id }}">삭제</button>
             </div>
+            {% endif %}
             <div class="detail_back_button">
                 <button onclick="goBack()" class="back_button">목록보기</button>
             </div>

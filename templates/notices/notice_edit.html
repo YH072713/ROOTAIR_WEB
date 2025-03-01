@@ -9,22 +9,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notices/notice_edit.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='js/notices/notice_edit.js') }}" defer></script>
-    <script>
-        const togglebtn = document.querySelector('.navbar_togglebtn');
-        const menu = document.querySelector('.navbar_menu');
-        const member = document.querySelector('.navbar_member');
-    
-        togglebtn.addEventListener('click', ()=>{
-            menu.classList.toggle('active');
-            member.classList.toggle('active');
-        });
-    </script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar_logo">
             <a href="{{ url_for('main.main') }}">
-                <img src="{{ url_for('static', filename='images/rootair.jpg') }}" alt="로고">
+                <img src="{{ url_for('static', filename='images/rootair.jpg') }}"/>
             </a>
         </div>
         <ul class="navbar_menu">
@@ -47,11 +37,12 @@
             {% endif %}
         </ul>
     </nav>
+
     <div class="register_container_page">
         <div class="register_container">
             <h2>공지사항 수정</h2>
 
-            <form id="noticeForm" data-notice-id="{{ notices.notice_id }}" action="{{ url_for('notices.notice_edit_api',notice_id=notices.notice_id) }}" method="POST" enctype="multipart/form-data">
+            <form id="noticeForm" data-notice-id="{{ notice.notice_id }}" action="{{ url_for('notices.notice_edit_api', notice_id=notice.notice_id) }}" method="POST" enctype="multipart/form-data">
                 <label for="title">제목</label>
                 <input type="text" id="title" name="title" value="{{ notice.title }}">
 
@@ -59,42 +50,40 @@
                 <div class="file-upload-container">
                     <!-- 숨겨진 파일 업로드 input -->
                     <input type="file" id="file" name="file" style="display: none;">
-                
+
                     <!-- 기존 파일 정보를 유지하는 hidden input -->
                     {% if notice.file %}
                         <input type="file" id="fileUploadBtn" name="existing_file" value="{{ notices.file }}">
                     {% endif %}
-                
-                    
                 </div>
-
 
                 <label for="content">내용</label>
                 <textarea class="editcontent" id="content" name="content">{{ notices.content }}</textarea>
 
-            <div class="btnandcheck">
-                
-                <div class="btaline">
-                    <button type="submit" id="submit_btn">공지 수정</button>
+                <div class="btnandcheck">
+                    <div class="btaline">
+                        <button type="submit" id="submit_btn">공지 수정</button>
+                    </div>
                 </div>
-            </div>
-            <div class="defaultfile_box">
+                <div class="defaultfile_box">
                 <!-- 선택된 파일명 표시 -->
                 <label for="file">첨부되어있는파일</label>
-                <div class="defaultfile">
+                    <div class="defaultfile">
                     
-                    <span id="fileNameDisplay">
+                        <span id="fileNameDisplay">
                         {% if notices.file %}
                             <span id="existingFile">{{ notices.file.split('/')[-1] }}</span>
-                            <button type="button" id="removeFile">삭제</button>
-                        {% else %}
-                            선택된 파일 없음
-                        {% endif %}
-                    </span>
+                                <button type="button" id="removeFile">삭제</button>
+                            {% else %}
+                                선택된 파일 없음
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
+
     <script src="{{ url_for('static', filename='js/notices/notice_edit.js') }}"></script>
 </body>
 <script>

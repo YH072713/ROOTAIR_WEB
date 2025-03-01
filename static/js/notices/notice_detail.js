@@ -4,14 +4,32 @@
 function goBack() {
     window.location.href = "/notices";  // 공지사항 목록 페이지로 이동
 }
+function goedit() {
+    const noticeId = document.getElementById("editBtn").getAttribute("data-notice-id");
+
+    if (!noticeId) {
+        alert("공지사항 ID를 찾을 수 없습니다.");
+        return;
+}
+
+    window.location.href = `/notices/edit/${noticeId}`; // ✅ 공지사항 수정 페이지로 이동
+}
+
+
+//삭제
 document.addEventListener("DOMContentLoaded", function() {
     const deleteBtn = document.getElementById("deleteBtn");
 
     if (deleteBtn) {
         deleteBtn.addEventListener("click", function() {
-            if (confirm("정말 삭제하시겠습니까?")) {
-                const noticeId = deleteBtn.getAttribute("data-notice-id");
+            const noticeId = deleteBtn.getAttribute("data-notice-id"); // HTML에서 ID 가져오기
 
+            if (!noticeId) {
+                alert("공지사항 ID를 찾을 수 없습니다.");
+                return;
+            }
+
+            if (confirm("정말 삭제하시겠습니까?")) {
                 fetch(`/notices/api/delete/${noticeId}`, {
                     method: "DELETE",
                     headers: {

@@ -1,3 +1,42 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("noticeForm");
+    let isSubmitting = false; // ✅ 중복 제출 방지 변수 추가
+
+    if (form) {
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // ✅ 기본 제출 방지
+
+            if (isSubmitting) return; // ✅ 이미 제출 중이면 중단
+            isSubmitting = true; // ✅ 중복 방지 활성화
+
+            const formData = new FormData(form);
+            const noticeId = form.getAttribute("data-notice-id");
+
+            if (!noticeId) {
+                isSubmitting = false; // ✅ 중복 방지 해제
+                return;
+            }
+
+            fetch(`/notices/api/edit/${noticeId}`, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url; // ✅ 알림창 없이 자동 이동
+                }
+            })
+            .catch(error => {
+                console.error("공지 수정 중 오류 발생:", error);
+            })
+            .finally(() => {
+                isSubmitting = false; // ✅ 요청이 끝나면 다시 제출 가능하도록 설정
+            });
+        });
+    }
+});
+
 const togglebtn = document.querySelector('.navbar_togglebtn');
 const menu = document.querySelector('.navbar_menu');
 const member = document.querySelector('.navbar_member');
@@ -5,50 +44,4 @@ const member = document.querySelector('.navbar_member');
 togglebtn.addEventListener('click', ()=>{
     menu.classList.toggle('active');
     member.classList.toggle('active');
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("noticeForm");
-
-    form.addEventListener("submit", function (event) {
-        event.preventDefault(); // 기본 제출 동작 방지
-
-        const formData = new FormData(form);
-        
-        // ✅ 체크박스 값 추가
-        formData.append("isPrivate", document.getElementById("private").checked);
-        
-        // ✅ notice_id 값을 HTML에서 가져오기
-        const noticeId = form.getAttribute("data-notice-id");
-        if (!noticeId) {
-            alert("문의 ID를 찾을 수 없습니다.");
-            return;
-        }
-
-        fetch(`/notices/api/edit/${noticeId}`, {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())  // ✅ JSON 응답 받기
-        .then(data => {
-            if (data.message) {
-                alert(data.message);
-                window.location.href = "/notices";
-            } else {
-                alert("공지 수정 실패: " + data.error);
-            }
-        })
-        .catch(error => console.error("에러 발생:", error));
-    });
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const fileInput = document.getElementById("file");
-    const fileNameDisplay = document.getElementById("fileNameDisplay");
-
-    fileInput.addEventListener("change", function () {
-        if (fileInput.files.length > 0) {
-            fileNameDisplay.textContent = fileInput.files[0].name; // ✅ 새 파일명 표시
-        } else {
-            fileNameDisplay.textContent = "선택된 파일 없음";
-        }
-    });
 });
